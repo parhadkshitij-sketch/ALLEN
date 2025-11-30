@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+
+        .allen-blue {
+            color: #0056D2;
+        }
+        
+        .bg-allen-blue {
+            background-color: #0056D2;
+        }
+        
+        .btn-blue {
+             background-color: #0056D2;
+        }
+        .btn-blue:hover {
+             background-color: #0044a5;
+        }
+
+        .text-allen-blue {
+            color: #0056D2;
+        }
+
+        /* Pagination buttons */
+        .page-btn {
+            transition: all 0.2s;
+        }
+        .page-btn:hover:not(:disabled) {
+            background-color: #e2e8f0;
+            transform: translateY(-1px);
+        }
+        .page-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        /* Toast Notification Styles */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #1e293b;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px 24px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+        
+        .hidden-view {
+            display: none !important;
+        }
+
+        /* Circular Progress for Score */
+        .score-circle {
+            /* Default fallback, will be overridden by JS */
+            background: conic-gradient(#ffffff 0%, rgba(255,255,255,0.2) 0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        /* Smooth transitions for report card */
+        .report-card-transition {
+            transition: background 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-[#F0F5FA] h-screen flex overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="w-24 bg-white flex flex-col items-center py-6 border-r border-gray-200 z-20 shadow-sm flex-shrink-0">
+        <!-- Spacer for Logo alignment if needed, or just navigation items -->
+        <div class="mt-20 flex flex-col items-center gap-8 w-full">
+            
+            <!-- Tests Icon (Sidebar Item 1) -->
+            <div id="nav-tests" onclick="switchView('tests')" class="flex flex-col items-center gap-2 cursor-pointer group w-full relative">
+                <!-- Active Indicator Bar -->
+                <div id="bar-tests" class="absolute left-0 top-1/2 -translate-y-1/2 h-10 w-1 bg-allen-blue rounded-r-md"></div>
+                
+                <div id="icon-bg-tests" class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-50 text-allen-blue transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <path d="M9 13h6"/>
+                        <path d="M9 17h6"/>
+                        <path d="M10 9h1"/>
+                    </svg>
+                </div>
+                <span id="text-tests" class="text-xs font-semibold text-gray-800">Tests</span>
+            </div>
+
+            <!-- Results Section (Sidebar Item 2) -->
+            <div id="nav-results" onclick="switchView('results')" class="flex flex-col items-center gap-2 cursor-pointer group w-full relative">
+                 <!-- Active Indicator Bar (Hidden by default) -->
+                <div id="bar-results" class="absolute left-0 top-1/2 -translate-y-1/2 h-10 w-1 bg-allen-blue rounded-r-md hidden"></div>
+
+                <div id="icon-bg-results" class="w-12 h-12 flex items-center justify-center rounded-xl text-gray-500 group-hover:bg-gray-50 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        <path d="M9 14l2 2 4-4"></path>
+                    </svg>
+                </div>
+                <span id="text-results" class="text-xs font-semibold text-gray-600">Results</span>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <!-- HEADER -->
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 z-10">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <h1 class="text-2xl font-black tracking-tighter allen-blue italic">ALLEN</h1>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-6">
+                <!-- Bell Notification -->
+                <button onclick="showToast('nothing here')" class="relative p-2 rounded-full hover:bg-gray-100 transition-colors border border-gray-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600">
+                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                    </svg>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">4</span>
+                </button>
+
+                <!-- User Profile Info -->
+                <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+                    <div class="text-right hidden md:block">
+                        <div class="text-sm font-bold text-gray-800">12th • JEE Adv.</div>
+                        <a href="#" class="text-xs text-blue-600 font-medium hover:underline flex items-center justify-end gap-1">
+                            Change course 
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </a>
+                    </div>
+                    <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden border border-gray-300">
+                        <!-- Placeholder Avatar -->
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Felix" alt="User Avatar" class="h-full w-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN SCROLLABLE AREA -->
+        <main class="flex-1 overflow-y-auto p-0 relative bg-[#F0F5FA]">
+            
+            <!-- VIEW 1: TESTS (Empty State) -->
+            <div id="view-tests" class="max-w-7xl mx-auto p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Your tests</h2>
+                    <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-700">View all</a>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex gap-3 mb-8">
+                    <button class="px-5 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-black transition-colors">
+                        Upcoming
+                    </button>
+                </div>
+
+                <!-- CONTENT AREA (Empty State) -->
+                <div class="w-full bg-white/50 border-2 border-dashed border-gray-300 rounded-2xl h-80 flex flex-col items-center justify-center text-center p-6 mb-8">
+                    <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0056D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-1">No upcoming tests</h3>
+                    <p class="text-gray-500 text-sm max-w-sm">
+                        You're all caught up! There are no tests scheduled for you at the moment. Check back later for updates.
+                    </p>
+                </div>
+            </div>
+
+            <!-- VIEW 2: RESULTS (Single Card) -->
+            <div id="view-results" class="max-w-7xl mx-auto hidden-view p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Your tests</h2>
+                    <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-700">View all</a>
+                </div>
+
+                <!-- Tabs for Results -->
+                <div class="flex gap-3 mb-8">
+                    <button class="px-5 py-2 bg-white text-gray-600 text-sm font-medium rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors">
+                        Upcoming
+                    </button>
+                    <button class="px-5 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-black transition-colors">
+                        Past Tests
+                    </button>
+                    <button class="px-5 py-2 bg-white text-gray-600 text-sm font-medium rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors">
+                        Missed Tests
+                    </button>
+                </div>
+
+                <!-- RESULTS CARD GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- SINGLE CARD -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                        <!-- Green Header -->
+                        <div class="bg-[#D1FAE5] py-2 text-center border-b border-[#A7F3D0]">
+                            <span class="text-[#047857] text-sm font-bold">Results are out</span>
+                        </div>
+                        
+                        <div class="p-5 flex flex-col h-full">
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">SCORE TEST – Paper 1</h3>
+                            
+                            <!-- Test Details -->
+                            <div class="flex items-center gap-3 text-sm text-gray-600 mb-4">
+                                <div class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                    <span>4 Dec</span>
+                                </div>
+                                <div class="h-3 w-px bg-gray-300"></div>
+                                <div class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    <span>180 Min</span>
+                                </div>
+                                <div class="h-3 w-px bg-gray-300"></div>
+                                <div class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                    <span>Online</span>
+                                </div>
+                            </div>
+
+                            <!-- View Syllabus Link -->
+                            <a href="#" class="inline-flex items-center gap-1 text-blue-600 text-sm font-semibold hover:underline mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                                View Syllabus
+                            </a>
+
+                            <!-- Buttons -->
+                            <div class="grid grid-cols-2 gap-3 mt-auto">
+                                <button class="py-2.5 px-4 rounded-full border border-blue-600 text-blue-600 font-semibold text-sm hover:bg-blue-50 transition-colors">
+                                    Re-attempt
+                                </button>
+                                <button onclick="openScoreAnalysis()" class="py-2.5 px-4 rounded-full btn-blue text-white font-semibold text-sm transition-colors shadow-sm">
+                                    View Result
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: SCORE ANALYSIS (Detailed Result) -->
+            <div id="view-score-analysis" class="w-full hidden-view bg-[#F0F5FA] min-h-full pb-10">
+                <!-- Top Nav Bar for Result View -->
+                <div class="sticky top-0 bg-[#F0F5FA] z-20 px-8 py-4 flex items-center justify-between border-b border-gray-200/50 backdrop-blur-sm">
+                    <div class="flex items-center gap-4">
+                        <button onclick="handleBackNavigation()" class="p-2 hover:bg-white rounded-full transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        </button>
+                        <div class="flex items-center gap-2 text-lg text-gray-800">
+                            <span class="font-bold">Result:</span>
+                            <span>SCORE TEST - Paper 1 | 28th Nov, 2025 | Online Mode</span>
+                        </div>
+                        <div class="ml-4 px-3 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-600 flex items-center gap-1 cursor-pointer hover:bg-gray-200">
+                            Main Test <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-white text-gray-600 font-bold pb-2 text-2xl">...</button>
+                        <!-- Button removed here -->
+                    </div>
+                </div>
+
+                <div class="flex max-w-[1600px] mx-auto p-6 gap-6">
+                    <!-- LEFT MENU -->
+                    <div class="w-64 flex-shrink-0">
+                        <div class="bg-white rounded-2xl shadow-sm p-2 sticky top-24">
+                            <!-- OVERVIEW LINK -->
+                            <div id="nav-item-overview" onclick="updateReportView('overview')" class="flex items-center justify-between p-3 rounded-xl cursor-pointer bg-gray-100/50">
+                                <div class="flex items-center gap-3">
+                                    <div id="nav-indicator-overview" class="w-1 h-8 bg-green-500 rounded-full"></div>
+                                    <span class="font-bold text-gray-800">Overview</span>
+                                </div>
+                                <div id="nav-dot-overview" class="w-2 h-2 bg-green-500 rounded-full"></div>
+                            </div>
+                            
+                            <!-- SUBJECTS DROPDOWN -->
+                            <div class="mt-1">
+                                <div onclick="toggleSubjects()" class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl cursor-pointer text-gray-600">
+                                    <span class="pl-4 font-medium">Subjects</span>
+                                    <svg id="subject-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </div>
+                                
+                                <!-- SUBJECT SUB-MENU -->
+                                <div id="subject-submenu" class="pl-4 hidden">
+                                    <!-- Chemistry -->
+                                    <div id="nav-item-chemistry" onclick="updateReportView('chemistry')" class="flex items-center justify-between p-3 rounded-xl cursor-pointer hover:bg-gray-50 text-gray-600 relative">
+                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-green-500 hidden" id="nav-indicator-chemistry"></div>
+                                        <span class="pl-4 text-sm font-medium">Chemistry</span>
+                                        <div id="nav-dot-chemistry" class="w-2 h-2 bg-green-500 rounded-full hidden"></div>
+                                    </div>
+                                    <!-- Physics -->
+                                    <div id="nav-item-physics" onclick="updateReportView('physics')" class="flex items-center justify-between p-3 rounded-xl cursor-pointer hover:bg-gray-50 text-gray-600 relative">
+                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-green-500 hidden" id="nav-indicator-physics"></div>
+                                        <span class="pl-4 text-sm font-medium">Physics</span>
+                                        <div id="nav-dot-physics" class="w-2 h-2 bg-green-500 rounded-full hidden"></div>
+                                    </div>
+                                    <!-- Maths -->
+                                    <div id="nav-item-maths" onclick="updateReportView('maths')" class="flex items-center justify-between p-3 rounded-xl cursor-pointer hover:bg-gray-50 text-gray-600 relative">
+                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-green-500 hidden" id="nav-indicator-maths"></div>
+                                        <span class="pl-4 text-sm font-medium">Maths</span>
+                                        <div id="nav-dot-maths" class="w-2 h-2 bg-green-500 rounded-full hidden"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT CONTENT -->
+                    <div class="flex-1 space-y-6">
+                        
+                        <!-- MAIN REPORT CARD -->
+                        <div id="report-card" class="report-card-transition bg-gradient-to-r from-[#FF9F29] to-[#FF8C00] rounded-2xl p-8 text-white relative overflow-hidden shadow-lg min-h-[320px] h-auto flex flex-col justify-between">
+                            
+                            <!-- Carousel Arrows -->
+                            <button onclick="navigateReport(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 z-20">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            </button>
+                            <button onclick="navigateReport(1)" class="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 z-20">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+
+                            <!-- Background decoration -->
+                            <div class="absolute right-0 top-0 h-full w-1/3 opacity-10 pointer-events-none">
+                                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill="#FFFFFF" d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,81.6,-46.6C91.4,-34.1,98.1,-19.2,95.8,-4.9C93.5,9.4,82.2,23.1,70.6,34.1C59.1,45.2,47.3,53.6,34.9,60.8C22.5,68,9.5,74,-2.6,78.5C-14.7,83,-25.9,86,-35.5,81.4C-45.1,76.8,-53.1,64.6,-61.7,53.1C-70.3,41.6,-79.5,30.8,-82.9,18.4C-86.3,6,-83.9,-8,-76.8,-20.1C-69.7,-32.2,-57.9,-42.4,-45.8,-50.3C-33.7,-58.2,-21.3,-63.9,-8.2,-62.5C4.9,-61.1,28.8,-79.4,30.5,-83.6L44.7,-76.4Z" transform="translate(100 100)" />
+                                </svg>
+                            </div>
+
+                            <!-- Title (Optional for specific subjects) -->
+                            <div id="report-title" class="text-xl font-bold absolute top-6 left-8 z-10 hidden">Physics Report</div>
+
+                            <!-- Circle & Average -->
+                            <div class="flex flex-col items-center justify-center relative z-10 mt-2">
+                                <!-- Added ID for dynamic updates -->
+                                <div id="score-progress-ring" class="w-40 h-40 score-circle mb-4 shadow-xl">
+                                    <div id="score-inner-circle" class="w-36 h-36 bg-[#FF961F] rounded-full flex flex-col items-center justify-center transition-colors duration-500">
+                                        <span id="score-obtained" class="text-4xl font-bold">181</span>
+                                        <div class="w-12 h-0.5 bg-white/50 my-1"></div>
+                                        <span id="score-total" class="text-xl font-medium opacity-90">300</span>
+                                    </div>
+                                </div>
+                                <div id="class-average" class="font-semibold text-lg">Class average : 108</div>
+                            </div>
+
+                            <!-- Ranks -->
+                            <div class="grid grid-cols-3 gap-4 relative z-10 mt-4">
+                                <div class="bg-white/20 backdrop-blur-md rounded-xl p-4">
+                                    <div class="text-xs font-medium opacity-80 mb-1">Test Rank</div>
+                                    <div class="flex items-baseline gap-1">
+                                        <span id="rank-test" class="text-2xl font-bold">40</span>
+                                        <span id="rank-test-total" class="text-sm opacity-70">/552</span>
+                                    </div>
+                                    <div id="percentile-test" class="text-xs mt-1">92.93 Percentile</div>
+                                </div>
+                                <div class="bg-white/20 backdrop-blur-md rounded-xl p-4">
+                                    <div class="text-xs font-medium opacity-80 mb-1">Campus Rank</div>
+                                    <div class="flex items-baseline gap-1">
+                                        <span id="rank-campus" class="text-2xl font-bold">19</span>
+                                        <span id="rank-campus-total" class="text-sm opacity-70">/114</span>
+                                    </div>
+                                    <div id="percentile-campus" class="text-xs mt-1">84.21 Percentile</div>
+                                </div>
+                                <div class="bg-white/20 backdrop-blur-md rounded-xl p-4">
+                                    <div class="text-xs font-medium opacity-80 mb-1">Batch Rank</div>
+                                    <div class="flex items-baseline gap-1">
+                                        <span id="rank-batch" class="text-2xl font-bold">7</span>
+                                        <span id="rank-batch-total" class="text-sm opacity-70">/32</span>
+                                    </div>
+                                    <div id="percentile-batch" class="text-xs mt-1">81.25 Percentile</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- QUESTION DETAILS -->
+                        <div class="bg-white rounded-2xl shadow-sm p-6">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">Question details</h3>
+                                    <p id="accuracy-text" class="text-gray-500 text-sm mt-1">You've answered 63% questions correctly</p>
+                                </div>
+                                <button class="p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-px bg-gray-200 rounded-xl overflow-hidden mb-6">
+                                <!-- Correct -->
+                                <div class="bg-[#E6F4F1] p-5 relative group cursor-pointer hover:bg-[#d8edeb] transition-colors">
+                                    <div class="text-sm text-gray-600 mb-1">Correct</div>
+                                    <div class="text-green-600 font-bold text-xl flex items-center gap-2">
+                                        <span id="qs-correct">47</span> 
+                                        <span id="marks-correct" class="text-xs font-normal text-gray-500">(+188.00 marks)</span>
+                                    </div>
+                                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
+                                </div>
+
+                                <!-- Incorrect -->
+                                <div class="bg-[#FBEBEB] p-5 relative group cursor-pointer hover:bg-[#f5e0e0] transition-colors">
+                                    <div class="text-sm text-gray-600 mb-1">Incorrect</div>
+                                    <div class="text-red-600 font-bold text-xl flex items-center gap-2">
+                                        <span id="qs-incorrect">7</span>
+                                        <span id="marks-incorrect" class="text-xs font-normal text-gray-500">(-7.00 marks)</span>
+                                    </div>
+                                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>
+                                </div>
+
+                                <!-- Unattempted -->
+                                <div class="bg-[#EFF2F5] p-5 relative group cursor-pointer hover:bg-[#e4e9ee] transition-colors">
+                                    <div class="text-sm text-gray-600 mb-1">Unattempted</div>
+                                    <div id="qs-unattempted" class="text-gray-800 font-bold text-xl">21</div>
+                                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-500"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUBJECT OVERVIEW TABLE (Visible only in Overview) -->
+                        <div id="subject-overview-table" class="bg-white rounded-2xl shadow-sm p-6">
+                            <h3 class="text-lg font-bold text-gray-800 mb-6">Subject Overview</h3>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                                            <th class="pb-3 pl-2">Subject</th>
+                                            <th class="pb-3">Score</th>
+                                            <th class="pb-3 text-green-600">✓ Qs</th>
+                                            <th class="pb-3 text-red-600">✕ Qs</th>
+                                            <th class="pb-3">Time Spent</th>
+                                            <th class="pb-3"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        <!-- Chemistry -->
+                                        <tr onclick="updateReportView('chemistry')" class="cursor-pointer hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-2">
+                                                <div class="font-bold text-gray-700">CHEMISTRY</div>
+                                                <div class="text-xs text-gray-400 mt-0.5">Rank 277</div>
+                                            </td>
+                                            <td class="py-4 font-semibold text-gray-700">45</td>
+                                            <td class="py-4 font-medium text-gray-600">12</td>
+                                            <td class="py-4 font-medium text-gray-600">3</td>
+                                            <td class="py-4 font-medium text-gray-600">17m 10s</td>
+                                            <td class="py-4 text-right pr-2">
+                                                <button class="text-gray-400 hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+                                            </td>
+                                        </tr>
+                                        <!-- Physics -->
+                                        <tr onclick="updateReportView('physics')" class="cursor-pointer hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-2">
+                                                <div class="font-bold text-gray-700">PHYSICS</div>
+                                                <div class="text-xs text-gray-400 mt-0.5">Rank 111</div>
+                                            </td>
+                                            <td class="py-4 font-semibold text-gray-700">53</td>
+                                            <td class="py-4 font-medium text-gray-600">14</td>
+                                            <td class="py-4 font-medium text-gray-600">3</td>
+                                            <td class="py-4 font-medium text-gray-600">02h 09m 13s</td>
+                                            <td class="py-4 text-right pr-2">
+                                                <button class="text-gray-400 hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+                                            </td>
+                                        </tr>
+                                        <!-- Maths -->
+                                        <tr onclick="updateReportView('maths')" class="cursor-pointer hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-2">
+                                                <div class="font-bold text-gray-700">MATHS</div>
+                                                <div class="text-xs text-gray-400 mt-0.5">Rank 4</div>
+                                            </td>
+                                            <td class="py-4 font-semibold text-gray-700">83</td>
+                                            <td class="py-4 font-medium text-gray-600">21</td>
+                                            <td class="py-4 font-medium text-gray-600">1</td>
+                                            <td class="py-4 font-medium text-gray-600">33m 36s</td>
+                                            <td class="py-4 text-right pr-2">
+                                                <button class="text-gray-400 hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- LEADERBOARD SECTION (New) -->
+                        <div id="leaderboard-section" class="bg-white rounded-2xl shadow-sm p-6">
+                            <div class="flex items-center gap-3 mb-6">
+                                <button class="hover:bg-gray-100 p-2 rounded-full transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                </button>
+                                <h3 class="text-xl font-bold text-gray-900">Leaderboard</h3>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full whitespace-nowrap">
+                                    <thead>
+                                        <tr class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                                            <th class="pb-3 pl-4">Rank</th>
+                                            <th class="pb-3">Name</th>
+                                            <th class="pb-3">Score</th>
+                                            <th class="pb-3 text-green-600">✓ QS</th>
+                                            <th class="pb-3 text-red-600">✕ QS</th>
+                                            <th class="pb-3">Time Taken</th>
+                                            <th class="pb-3">Chemistry</th>
+                                            <th class="pb-3">Maths</th>
+                                            <th class="pb-3">Physics</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 text-sm">
+                                        <!-- Rank 1 -->
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-4">
+                                                <div class="w-8 h-8 flex items-center justify-center">
+                                                    <!-- Gold Medal SVG -->
+                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M12 17L3 8.5L4.5 2H19.5L21 8.5L12 17Z" fill="#F59E0B" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/>
+                                                        <path d="M12 17V8.5" stroke="#B45309" stroke-width="2" stroke-linecap="round"/>
+                                                        <circle cx="12" cy="5" r="1.5" fill="#FEF3C7"/>
+                                                        <path d="M7 2L12 17L17 2" stroke="#B45309" stroke-width="1.5" stroke-linejoin="round"/>
+                                                        <path d="M3 8.5H21" stroke="#B45309" stroke-width="2"/>
+                                                    </svg>
+                                                </div>
+                                            </td>
+                                            <td class="py-4 font-semibold text-gray-800">Uday Vishal Gaikwad</td>
+                                            <td class="py-4 font-bold text-gray-700">296</td>
+                                            <td class="py-4 text-green-600 font-medium">74</td>
+                                            <td class="py-4 text-red-500 font-medium">0</td>
+                                            <td class="py-4 text-gray-600">2H 31M</td>
+                                            <td class="py-4 text-gray-600">96</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                        </tr>
+                                        <!-- Rank 2 -->
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-4">
+                                                <div class="w-8 h-8 flex items-center justify-center">
+                                                    <!-- Green/Silver Medal SVG -->
+                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M12 17L3 8.5L4.5 2H19.5L21 8.5L12 17Z" fill="#84CC16" stroke="#4D7C0F" stroke-width="2" stroke-linejoin="round"/>
+                                                        <path d="M12 17V8.5" stroke="#4D7C0F" stroke-width="2" stroke-linecap="round"/>
+                                                        <circle cx="12" cy="5" r="1.5" fill="#ECFCCB"/>
+                                                        <path d="M7 2L12 17L17 2" stroke="#4D7C0F" stroke-width="1.5" stroke-linejoin="round"/>
+                                                        <path d="M3 8.5H21" stroke="#4D7C0F" stroke-width="2"/>
+                                                    </svg>
+                                                </div>
+                                            </td>
+                                            <td class="py-4 font-semibold text-gray-800">Chakshan Arora</td>
+                                            <td class="py-4 font-bold text-gray-700">295</td>
+                                            <td class="py-4 text-green-600 font-medium">74</td>
+                                            <td class="py-4 text-red-500 font-medium">1</td>
+                                            <td class="py-4 text-gray-600">2H 20M</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                            <td class="py-4 text-gray-600">95</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                        </tr>
+                                        <!-- Rank 3 -->
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-4">
+                                                <div class="w-8 h-8 flex items-center justify-center">
+                                                    <!-- Blue/Bronze Medal SVG -->
+                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M12 17L3 8.5L4.5 2H19.5L21 8.5L12 17Z" fill="#3B82F6" stroke="#1D4ED8" stroke-width="2" stroke-linejoin="round"/>
+                                                        <path d="M12 17V8.5" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round"/>
+                                                        <circle cx="12" cy="5" r="1.5" fill="#DBEAFE"/>
+                                                        <path d="M7 2L12 17L17 2" stroke="#1D4ED8" stroke-width="1.5" stroke-linejoin="round"/>
+                                                        <path d="M3 8.5H21" stroke="#1D4ED8" stroke-width="2"/>
+                                                    </svg>
+                                                </div>
+                                            </td>
+                                            <td class="py-4 font-semibold text-gray-800">Shiv Rameshkumar ...</td>
+                                            <td class="py-4 font-bold text-gray-700">290</td>
+                                            <td class="py-4 text-green-600 font-medium">73</td>
+                                            <td class="py-4 text-red-500 font-medium">2</td>
+                                            <td class="py-4 text-gray-600">1H 12M</td>
+                                            <td class="py-4 text-gray-600">95</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                            <td class="py-4 text-gray-600">95</td>
+                                        </tr>
+                                        <!-- Rank 4 -->
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-4 font-bold text-gray-600 text-center w-12">4</td>
+                                            <td class="py-4 font-medium text-gray-700">Roneet Chaudhari</td>
+                                            <td class="py-4 font-bold text-gray-700">290</td>
+                                            <td class="py-4 text-green-600 font-medium">73</td>
+                                            <td class="py-4 text-red-500 font-medium">2</td>
+                                            <td class="py-4 text-gray-600">2H 58M</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                            <td class="py-4 text-gray-600">90</td>
+                                        </tr>
+                                        <!-- Rank 5 -->
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-4 font-bold text-gray-600 text-center">5</td>
+                                            <td class="py-4 font-medium text-gray-700">Aditya Chavan</td>
+                                            <td class="py-4 font-bold text-gray-700">290</td>
+                                            <td class="py-4 text-green-600 font-medium">73</td>
+                                            <td class="py-4 text-red-500 font-medium">2</td>
+                                            <td class="py-4 text-gray-600">-</td>
+                                            <td class="py-4 text-gray-600">95</td>
+                                            <td class="py-4 text-gray-600">95</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                        </tr>
+                                        <!-- Rank 6 -->
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-4 font-bold text-gray-600 text-center">6</td>
+                                            <td class="py-4 font-medium text-gray-700">Rutu Shankar Hendre</td>
+                                            <td class="py-4 font-bold text-gray-700">282</td>
+                                            <td class="py-4 text-green-600 font-medium">71</td>
+                                            <td class="py-4 text-red-500 font-medium">2</td>
+                                            <td class="py-4 text-gray-600">3H 0M</td>
+                                            <td class="py-4 text-gray-600">96</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                            <td class="py-4 text-gray-600">86</td>
+                                        </tr>
+                                        <!-- Rank 7 -->
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-4 font-bold text-gray-600 text-center">7</td>
+                                            <td class="py-4 font-medium text-gray-700">Ashutosh Jayesh Kal...</td>
+                                            <td class="py-4 font-bold text-gray-700">280</td>
+                                            <td class="py-4 text-green-600 font-medium">71</td>
+                                            <td class="py-4 text-red-500 font-medium">4</td>
+                                            <td class="py-4 text-gray-600">-</td>
+                                            <td class="py-4 text-gray-600">90</td>
+                                            <td class="py-4 text-gray-600">95</td>
+                                            <td class="py-4 text-gray-600">95</td>
+                                        </tr>
+                                        <!-- Rank 8 -->
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-4 font-bold text-gray-600 text-center">8</td>
+                                            <td class="py-4 font-medium text-gray-700">Prajwal Kawade</td>
+                                            <td class="py-4 font-bold text-gray-700">280</td>
+                                            <td class="py-4 text-green-600 font-medium">71</td>
+                                            <td class="py-4 text-red-500 font-medium">4</td>
+                                            <td class="py-4 text-gray-600">2H 53M</td>
+                                            <td class="py-4 text-gray-600">95</td>
+                                            <td class="py-4 text-gray-600">95</td>
+                                            <td class="py-4 text-gray-600">90</td>
+                                        </tr>
+                                        <!-- Rank 9 -->
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-4 font-bold text-gray-600 text-center">9</td>
+                                            <td class="py-4 font-medium text-gray-700">Suraj Ravindra Thorat</td>
+                                            <td class="py-4 font-bold text-gray-700">280</td>
+                                            <td class="py-4 text-green-600 font-medium">71</td>
+                                            <td class="py-4 text-red-500 font-medium">4</td>
+                                            <td class="py-4 text-gray-600">-</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                            <td class="py-4 text-gray-600">85</td>
+                                            <td class="py-4 text-gray-600">95</td>
+                                        </tr>
+                                        <!-- Rank 10 -->
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="py-4 pl-4 font-bold text-gray-600 text-center">10</td>
+                                            <td class="py-4 font-medium text-gray-700">Charvi Kale</td>
+                                            <td class="py-4 font-bold text-gray-700">279</td>
+                                            <td class="py-4 text-green-600 font-medium">70</td>
+                                            <td class="py-4 text-red-500 font-medium">1</td>
+                                            <td class="py-4 text-gray-600">-</td>
+                                            <td class="py-4 text-gray-600">83</td>
+                                            <td class="py-4 text-gray-600">100</td>
+                                            <td class="py-4 text-gray-600">96</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Toast Notification Element -->
+    <div id="toast"></div>
+
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function openScoreAnalysis() {
+            // Hide all other views
+            document.getElementById('view-tests').classList.add('hidden-view');
+            document.getElementById('view-results').classList.add('hidden-view');
+            
+            // Show Analysis
+            document.getElementById('view-score-analysis').classList.remove('hidden-view');
+
+            // Reset to overview by default when opening
+            updateReportView('overview');
+
+            // Update sidebar (Tests -> Results)
+            document.getElementById('bar-tests').classList.add('hidden');
+            document.getElementById('icon-bg-tests').classList.remove('bg-blue-50', 'text-allen-blue');
+            document.getElementById('icon-bg-tests').classList.add('text-gray-500');
+            document.getElementById('text-tests').classList.remove('text-gray-800');
+            document.getElementById('text-tests').classList.add('text-gray-600');
+
+            document.getElementById('bar-results').classList.remove('hidden');
+            document.getElementById('icon-bg-results').classList.add('bg-blue-50', 'text-allen-blue');
+            document.getElementById('icon-bg-results').classList.remove('text-gray-500');
+            document.getElementById('text-results').classList.add('text-gray-800');
+            document.getElementById('text-results').classList.remove('text-gray-600');
+        }
+
+        function switchView(viewName) {
+            const viewTests = document.getElementById('view-tests');
+            const viewResults = document.getElementById('view-results');
+            const viewScoreAnalysis = document.getElementById('view-score-analysis');
+            
+            const navTestsBar = document.getElementById('bar-tests');
+            const navResultsBar = document.getElementById('bar-results');
+            
+            const iconBgTests = document.getElementById('icon-bg-tests');
+            const iconBgResults = document.getElementById('icon-bg-results');
+            
+            const textTests = document.getElementById('text-tests');
+            const textResults = document.getElementById('text-results');
+
+            // Hide Analysis View when switching main tabs
+            viewScoreAnalysis.classList.add('hidden-view');
+
+            if (viewName === 'tests') {
+                viewTests.classList.remove('hidden-view');
+                viewResults.classList.add('hidden-view');
+                navTestsBar.classList.remove('hidden');
+                iconBgTests.classList.add('bg-blue-50', 'text-allen-blue');
+                iconBgTests.classList.remove('text-gray-500');
+                textTests.classList.add('text-gray-800');
+                textTests.classList.remove('text-gray-600');
+                navResultsBar.classList.add('hidden');
+                iconBgResults.classList.remove('bg-blue-50', 'text-allen-blue');
+                iconBgResults.classList.add('text-gray-500');
+                textResults.classList.remove('text-gray-800');
+                textResults.classList.add('text-gray-600');
+            } 
+            else if (viewName === 'results') {
+                viewTests.classList.add('hidden-view');
+                viewResults.classList.remove('hidden-view');
+                navTestsBar.classList.add('hidden');
+                iconBgTests.classList.remove('bg-blue-50', 'text-allen-blue');
+                iconBgTests.classList.add('text-gray-500');
+                textTests.classList.remove('text-gray-800');
+                textTests.classList.add('text-gray-600');
+                navResultsBar.classList.remove('hidden');
+                iconBgResults.classList.add('bg-blue-50', 'text-allen-blue');
+                iconBgResults.classList.remove('text-gray-500');
+                textResults.classList.add('text-gray-800');
+                textResults.classList.remove('text-gray-600');
+            }
+        }
+
+        /* --- REPORT LOGIC --- */
+        
+        let subjectsExpanded = false;
+        const reports = ['overview', 'chemistry', 'physics', 'maths'];
+        let currentReportIndex = 0;
+
+        const data = {
+            overview: {
+                title: "",
+                bgClass: "from-[#FF9F29] to-[#FF8C00]",
+                circleBg: "#FF961F",
+                score: 181,
+                total: 300,
+                avg: 108,
+                ranks: { test: 40, testTotal: 552, testPerc: "92.93", campus: 19, campusTotal: 114, campusPerc: "84.21", batch: 7, batchTotal: 32, batchPerc: "81.25" },
+                qs: { correct: 47, marksC: "+188.00", incorrect: 7, marksI: "-7.00", un: 21 },
+                accuracy: "63%",
+                showTable: true,
+            },
+            chemistry: {
+                title: "Chemistry Report",
+                bgClass: "from-[#7C3AED] to-[#6D28D9]", // Purple
+                circleBg: "#8B5CF6",
+                score: 45,
+                total: 100,
+                avg: 0,
+                ranks: { test: 277, testTotal: 552, testPerc: "50.00", campus: 65, campusTotal: 114, campusPerc: "43.86", batch: 27, batchTotal: 32, batchPerc: "18.75" },
+                qs: { correct: 12, marksC: "+48.00", incorrect: 3, marksI: "-3.00", un: 10 },
+                accuracy: "48%",
+                showTable: false,
+            },
+            physics: {
+                title: "Physics Report",
+                bgClass: "from-[#2563EB] to-[#1E40AF]", // Blue
+                circleBg: "#3B82F6",
+                score: 53,
+                total: 100,
+                avg: 0,
+                ranks: { test: 111, testTotal: 552, testPerc: "80.07", campus: 33, campusTotal: 114, campusPerc: "71.93", batch: 15, batchTotal: 32, batchPerc: "56.25" },
+                qs: { correct: 14, marksC: "+56.00", incorrect: 3, marksI: "-3.00", un: 8 },
+                accuracy: "56%",
+                showTable: false,
+            },
+            maths: {
+                title: "Maths Report",
+                bgClass: "from-[#0D9488] to-[#0F766E]", // Teal
+                circleBg: "#14B8A6",
+                score: 83,
+                total: 100,
+                avg: 0,
+                ranks: { test: 4, testTotal: 552, testPerc: "99.46", campus: 2, campusTotal: 114, campusPerc: "99.12", batch: 1, batchTotal: 32, batchPerc: "100.00" },
+                qs: { correct: 21, marksC: "+84.00", incorrect: 1, marksI: "-1.00", un: 3 },
+                accuracy: "84%",
+                showTable: false,
+            }
+        };
+
+        function toggleSubjects() {
+            subjectsExpanded = !subjectsExpanded;
+            const submenu = document.getElementById('subject-submenu');
+            const arrow = document.getElementById('subject-arrow');
+            
+            if (subjectsExpanded) {
+                submenu.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                submenu.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function updateReportView(type) {
+            // Ensure submenu is open if jumping to a subject
+            if (type !== 'overview' && !subjectsExpanded) {
+                toggleSubjects();
+            }
+
+            // Sync index for carousel
+            currentReportIndex = reports.indexOf(type);
+
+            // Update UI State (Sidebar Active Highlighting)
+            resetSidebarActive();
+            setActiveSidebar(type);
+
+            // Fetch Data
+            const d = data[type];
+
+            // Update Main Card visual
+            const card = document.getElementById('report-card');
+            card.className = `report-card-transition bg-gradient-to-r ${d.bgClass} rounded-2xl p-8 text-white relative overflow-hidden shadow-lg min-h-[320px] h-auto flex flex-col justify-between`;
+
+            // Inner circle color
+            document.getElementById('score-inner-circle').style.backgroundColor = d.circleBg;
+
+            // UPDATE PROGRESS RING DYNAMICALLY
+            const percentage = Math.round((d.score / d.total) * 100);
+            document.getElementById('score-progress-ring').style.background = `conic-gradient(#ffffff ${percentage}%, rgba(255,255,255,0.2) 0)`;
+
+            // Update Text Content
+            const titleEl = document.getElementById('report-title');
+            if (d.title) {
+                titleEl.textContent = d.title;
+                titleEl.classList.remove('hidden');
+            } else {
+                titleEl.classList.add('hidden');
+            }
+
+            document.getElementById('score-obtained').textContent = d.score;
+            document.getElementById('score-total').textContent = d.total;
+            document.getElementById('class-average').textContent = `Class average : ${d.avg}`;
+
+            document.getElementById('rank-test').textContent = d.ranks.test;
+            document.getElementById('rank-test-total').textContent = `/${d.ranks.testTotal}`;
+            document.getElementById('percentile-test').textContent = `${d.ranks.testPerc} Percentile`;
+
+            document.getElementById('rank-campus').textContent = d.ranks.campus;
+            document.getElementById('rank-campus-total').textContent = `/${d.ranks.campusTotal}`;
+            document.getElementById('percentile-campus').textContent = `${d.ranks.campusPerc} Percentile`;
+
+            document.getElementById('rank-batch').textContent = d.ranks.batch;
+            document.getElementById('rank-batch-total').textContent = `/${d.ranks.batchTotal}`;
+            document.getElementById('percentile-batch').textContent = `${d.ranks.batchPerc} Percentile`;
+
+            document.getElementById('accuracy-text').textContent = `You've answered ${d.accuracy} questions correctly`;
+
+            // Update Questions
+            document.getElementById('qs-correct').textContent = d.qs.correct;
+            document.getElementById('marks-correct').textContent = `(${d.qs.marksC} marks)`;
+            
+            document.getElementById('qs-incorrect').textContent = d.qs.incorrect;
+            document.getElementById('marks-incorrect').textContent = `(${d.qs.marksI} marks)`;
+
+            document.getElementById('qs-unattempted').textContent = d.qs.un;
+
+            // Toggle Table Visibility
+            const table = document.getElementById('subject-overview-table');
+            const leaderboard = document.getElementById('leaderboard-section');
+            if (d.showTable) {
+                table.classList.remove('hidden');
+                if (leaderboard) leaderboard.classList.remove('hidden');
+            } else {
+                table.classList.add('hidden');
+                if (leaderboard) leaderboard.classList.add('hidden');
+            }
+        }
+
+        function navigateReport(direction) {
+            currentReportIndex += direction;
+            if (currentReportIndex < 0) currentReportIndex = reports.length - 1;
+            if (currentReportIndex >= reports.length) currentReportIndex = 0;
+            
+            updateReportView(reports[currentReportIndex]);
+        }
+
+        function resetSidebarActive() {
+            // Reset Overview
+            document.getElementById('nav-item-overview').classList.remove('bg-gray-100/50');
+            document.getElementById('nav-indicator-overview').classList.remove('bg-green-500');
+            document.getElementById('nav-indicator-overview').classList.add('bg-transparent'); // or handle visibility
+            document.getElementById('nav-dot-overview').classList.add('hidden');
+
+            // Reset Subjects
+            ['chemistry', 'physics', 'maths'].forEach(sub => {
+                document.getElementById(`nav-item-${sub}`).classList.remove('bg-gray-50', 'text-gray-900');
+                document.getElementById(`nav-indicator-${sub}`).classList.add('hidden');
+                document.getElementById(`nav-dot-${sub}`).classList.add('hidden');
+            });
+        }
+
+        function setActiveSidebar(type) {
+            if (type === 'overview') {
+                document.getElementById('nav-item-overview').classList.add('bg-gray-100/50');
+                document.getElementById('nav-indicator-overview').classList.remove('bg-transparent');
+                document.getElementById('nav-indicator-overview').classList.add('bg-green-500');
+                document.getElementById('nav-dot-overview').classList.remove('hidden');
+            } else {
+                // It's a subject
+                const el = document.getElementById(`nav-item-${type}`);
+                el.classList.add('bg-gray-50', 'text-gray-900');
+                document.getElementById(`nav-indicator-${type}`).classList.remove('hidden');
+                document.getElementById(`nav-dot-${type}`).classList.remove('hidden');
+            }
+        }
+
+        function handleBackNavigation() {
+            // If currently viewing a subject report (not overview), go back to overview
+            if (reports[currentReportIndex] !== 'overview') {
+                updateReportView('overview');
+            } else {
+                // If already on overview, go back to the main results list
+                switchView('results');
+            }
+        }
+
+    </script>
+
+</body>
+</html>
