@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Student Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax for rendering equations -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #F0F5FA;
+            overflow-x: hidden; 
+            width: 100%;
+        }
+
+        /* Hide Scrollbar but allow scrolling */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .allen-blue { color: #0056D2; }
+        .bg-allen-blue { background-color: #0056D2; }
+        .btn-blue { background-color: #0056D2; }
+        .btn-blue:hover { background-color: #0044a5; }
+
+        /* Correct Answer Highlighting */
+        .correct-answer {
+            background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+            color: #15803d; /* green-700 */
+            font-weight: 600;
+        }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #1e293b;
+            color: #fff;
+            text-align: center;
+            border-radius: 99px;
+            padding: 12px 24px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 90px;
+            transform: translateX(-50%) translateY(20px);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @media (min-width: 768px) {
+            #toast { bottom: 40px; border-radius: 8px; }
+        }
+        
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .hidden-view { display: none !important; }
+
+        /* Circular Progress */
+        .score-circle {
+            background: conic-gradient(#ffffff 0%, rgba(255,255,255,0.2) 0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 1s ease-out;
+        }
+
+        .report-card-transition { transition: background 0.5s ease, transform 0.2s ease; }
+
+        /* Safe Area for Mobile Bottom Nav */
+        .safe-area-pb {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Solutions Panel Transition */
+        #solutions-panel {
+            transition: transform 0.3s ease-in-out;
+        }
+        .solutions-open {
+            transform: translateX(0) !important;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row text-gray-800 w-full overflow-hidden">
+
+    <!-- SOLUTIONS SIDE PANEL (Hidden by default) -->
+    <div id="solutions-modal" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeSolutions()"></div>
+        
+        <!-- Panel -->
+        <div id="solutions-panel" class="absolute right-0 top-0 bottom-0 w-full md:w-[600px] bg-white shadow-2xl flex flex-col transform translate-x-full h-full">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <div>
+                    <h2 id="solutions-title" class="text-xl font-bold text-gray-800">Solutions</h2>
+                    <p class="text-xs text-gray-500">SCORE TEST – Paper 1</p>
+                </div>
+                <button onclick="closeSolutions()" class="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div id="solutions-content" class="flex-1 overflow-y-auto p-6 bg-white">
+                
+                <!-- MATHS SECTION (Q1-Q25) -->
+                <div id="sol-maths" class="space-y-8 hidden">
+                    <!-- Q1 (Ans: 3) -->
+                    <div class="space-y-2">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q1.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>The distance of the line \(\frac{x-2}{2}=\frac{y-6}{3}=\frac{z-3}{4}\) from the point \((1,4,0)\) along the line \(\frac{x}{1}=\frac{y-2}{2}=\frac{z+3}{3}\) is:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded hover:bg-gray-50">\(\sqrt{17}\)</div>
+                                    <div class="p-2 border rounded hover:bg-gray-50">\(\sqrt{15}\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(\sqrt{14}\)</div>
+                                    <div class="p-2 border rounded hover:bg-gray-50">\(\sqrt{13}\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q2 (Ans: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q2.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Let \(A = \{(x,y)\in R\times R : |x+y|\ge 3\}\), \(B = \{(x,y)\in R\times R : |x|+|y|\le 3\}\). If \(C = \{(x,y)\in A\cap B : x=0 \text{ OR } y=0\}\), then \(\sum_{(x,y)\in C} |x+y|\) is:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">15</div>
+                                    <div class="p-2 border rounded text-center">24</div>
+                                    <div class="p-2 border rounded text-center">18</div>
+                                    <div class="p-2 border rounded correct-answer text-center">12</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q3 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q3.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Let \(X = R\times R\). Define relation \(R\) on \(X\): \((a_1,b_1)R(a_2,b_2) \Leftrightarrow b_1=b_2\).</p>
+                                <div class="mt-2 space-y-1">
+                                    <div class="p-2 border rounded">Both false</div>
+                                    <div class="p-2 border rounded correct-answer">I true, II false</div>
+                                    <div class="p-2 border rounded">Both true</div>
+                                    <div class="p-2 border rounded">I false, II true</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q4 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q4.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Let \(g(x)=\int x (3\sin x)\,dx + C\). If \(8(g(\pi/2)+g'(\pi/2)) = \alpha \frac{\pi}{3} + \beta \frac{\pi}{2} + \gamma\), then \(\alpha+\beta-\gamma\) equals:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">48</div>
+                                    <div class="p-2 border rounded correct-answer text-center">55</div>
+                                    <div class="p-2 border rounded text-center">62</div>
+                                    <div class="p-2 border rounded text-center">47</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q5 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q5.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>A rod of length 8 moves with ends on lines \(x-y+2=0\) and \(y+2=0\). If point \(P\) divides rod in ratio 2:1 and its locus is \(9(x^2 + \alpha y^2 + \beta xy + \gamma x + 28y) - 76 = 0\), then \(\alpha - \beta - \gamma\) is:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">22</div>
+                                    <div class="p-2 border rounded text-center">21</div>
+                                    <div class="p-2 border rounded correct-answer text-center">23</div>
+                                    <div class="p-2 border rounded text-center">24</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q6 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q6.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Square of shortest distance between \(\frac{x-2}{1}=\frac{y-1}{2}=\frac{z+3}{-3}\) and \(\frac{x+1}{2}=\frac{y+3}{4}=\frac{z+5}{-5}\) is \(m/n\), coprime. Find \(m+n\).</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">21</div>
+                                    <div class="p-2 border rounded correct-answer text-center">9</div>
+                                    <div class="p-2 border rounded text-center">14</div>
+                                    <div class="p-2 border rounded text-center">6</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q7 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q7.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>\(\lim_{x\to\infty} \frac{(2x^2 - 3x + 5)(3x-1)}{x^2(3x^2+5x+4)\sqrt{(3x+2)x^2}}\) is:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(\frac{\sqrt{3}}{e}\)</div>
+                                    <div class="p-2 border rounded">\(\frac{2e}{\sqrt{3}}\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(\frac{\sqrt{3}}{2e}\)</div>
+                                    <div class="p-2 border rounded">\(\frac{3\sqrt{e}}{2e}\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q8 (Ans: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q8.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Point A divides PQ where \(P(-1,-1,2)\), \(Q(5,5,10)\) in ratio \(r:1\). If \((OQ \cdot OA) - \frac{1}{5}|OP \times OA| = -2\), then \(r\) is:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">\(\sqrt{7}\)</div>
+                                    <div class="p-2 border rounded text-center">14</div>
+                                    <div class="p-2 border rounded text-center">3</div>
+                                    <div class="p-2 border rounded correct-answer text-center">7</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q9 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q9.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Length of chord of ellipse \(x^2/4 + y^2/2 = 1\) with midpoint \((1,1/2)\) is:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(5/3\)</div>
+                                    <div class="p-2 border rounded">\(\sqrt{15}/3\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(2\sqrt{15}/3\)</div>
+                                    <div class="p-2 border rounded">\(\sqrt{15}\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q10 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q10.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>System has no solution:<br> \(x+y+z=6\), \(x+2y+5z=9\), \(x+5y+\lambda z = \mu\).</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(\lambda=15,\ \mu\ne17\)</div>
+                                    <div class="p-2 border rounded">\(\lambda\ne17,\ \mu\ne18\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(\lambda=17,\ \mu\ne18\)</div>
+                                    <div class="p-2 border rounded">\(\lambda=17,\ \mu=18\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q11 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q11.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Range of \(f(x)=6+16\cos x\cdot \cos(\pi/3 - x)\cdot \cos(\pi/3 + x)\cdot \sin3x\cdot \cos6x\) is \([\alpha,\beta]\). Distance of \((\alpha,\beta)\) from line \(3x+4y+12=0\) is:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer text-center">11</div>
+                                    <div class="p-2 border rounded text-center">8</div>
+                                    <div class="p-2 border rounded text-center">10</div>
+                                    <div class="p-2 border rounded text-center">9</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q12 (Ans: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q12.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Solve differential equation: \(x=x(y)\), \(y = (x-y)\frac{dx}{dy}\sin(x/y)\), \(y>0\), \(x(1)=\pi/2\). Value of \(\cos(x(2))\):</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(1 - 2(\ln 2)^2\)</div>
+                                    <div class="p-2 border rounded">\(1 - 2(\ln 2)^2\) (Duplicate option)</div>
+                                    <div class="p-2 border rounded">\((\ln 2)-1\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(2(\ln 2)^2 - 1\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q13 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q13.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Spherical chocolate with ice cream layer of 1 cm. Layer melts at \(81 \text{ cm}^3/\text{min}\). Thickness decreases at \(1/(4\pi)\). Surface area of chocolate ball is:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">\(196\pi\)</div>
+                                    <div class="p-2 border rounded correct-answer text-center">\(256\pi\)</div>
+                                    <div class="p-2 border rounded text-center">\(225\pi\)</div>
+                                    <div class="p-2 border rounded text-center">\(128\pi\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q14 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q14.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Number of complex numbers \(z\) satisfying \(|z|=1\) and \(\frac{z}{\bar z} + \frac{\bar z}{|z|} = 1\):</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">4</div>
+                                    <div class="p-2 border rounded correct-answer text-center">8</div>
+                                    <div class="p-2 border rounded text-center">10</div>
+                                    <div class="p-2 border rounded text-center">6</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q15 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q15.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Matrix \(A=[a_{ij}]_{3\times3}\), \(A=\begin{bmatrix}0\\1\\0\end{bmatrix}\begin{bmatrix}0\\0\\1\end{bmatrix}\begin{bmatrix}4\\1\\3\end{bmatrix}\begin{bmatrix}0\\1\\0\end{bmatrix}\). Find \(a_{23}\):</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer text-center">–1</div>
+                                    <div class="p-2 border rounded text-center">2</div>
+                                    <div class="p-2 border rounded text-center">1</div>
+                                    <div class="p-2 border rounded text-center">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q16 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q16.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>\(I=\int_0^{\pi/2} \frac{\sin^{3/2}x}{\sin^{3/2}x + \cos^{3/2}x}\,dx\). Then \(\int_0^{21} \frac{x\sin x\cos x}{\sin^4 x + \cos^4 x} dx\) equals:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">\(\frac{\pi}{2}\)</div>
+                                    <div class="p-2 border rounded text-center">\(12 \frac{\pi}{2}\)</div>
+                                    <div class="p-2 border rounded correct-answer text-center">\(4 \frac{\pi}{2}\)</div>
+                                    <div class="p-2 border rounded text-center">\(16 \frac{\pi}{2}\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q17 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q17.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>16–square board, probability two chosen squares have no side in common:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">7/10</div>
+                                    <div class="p-2 border rounded correct-answer text-center">4/5</div>
+                                    <div class="p-2 border rounded text-center">23/30</div>
+                                    <div class="p-2 border rounded text-center">3/5</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q18 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q18.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Shortest distance from \((a,0)\) to parabola \(y^2=4x\) is 4. Circle through \((a,0)\) and focus, center on axis:</p>
+                                <div class="mt-2 space-y-1">
+                                    <div class="p-2 border rounded">\(x^2+y^2-10x+9=0\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(x^2+y^2-6x+5=0\)</div>
+                                    <div class="p-2 border rounded">\(x^2+y^2-4x+3=0\)</div>
+                                    <div class="p-2 border rounded">\(x^2+y^2-8x+7=0\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q19 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q19.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>In \((1+x)^p(1-x)^q\), coefficients of \(x\) and \(x^2\) are 1 and –2. Find \(p^2+q^2\):</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">18</div>
+                                    <div class="p-2 border rounded correct-answer text-center">13</div>
+                                    <div class="p-2 border rounded text-center">8</div>
+                                    <div class="p-2 border rounded text-center">20</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q20 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q20.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Area of region \(\{(x,y): -1\le x\le1,\ 0\le y\le a+e^{|x|} - e^{-x}\}\) is \(e^2+8e+1\). Find \(a\):</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">8</div>
+                                    <div class="p-2 border rounded text-center">7</div>
+                                    <div class="p-2 border rounded correct-answer text-center">5</div>
+                                    <div class="p-2 border rounded text-center">6</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q21 (Numerical: 8788) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q21.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Variance of numbers 8, 21, 34, 47, …, 320 is:</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 8788</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q22 (Numerical: 474) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q22.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Roots of \(3x^2 - px + q = 0\) are 10th and 11th terms of AP with d. Sum of first 11 terms = 88. Find \(3/2 q - 2p\):</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 474</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q23 (Numerical: 17280) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q23.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Number of ways 5 boys, 4 girls sit so that all boys together OR no two boys together:</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 17280</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q24 (Numerical: 15) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q24.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Parabola \(y^2=4x+16\); its focus is center of circle of radius 5. Values of \(\lambda\) for circle passing intersection of \(3x-y=0\) and \(x+\lambda y=4\). If values are \(\lambda_1 < \lambda_2\), find \(12\lambda_1 + 29\lambda_2\).</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 15</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q25 (Numerical: 31) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q25.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Roots \(\alpha,\beta\) of \(x^2 - ax - b = 0\). Let \(P_n = \alpha^n - \beta^n\). Given \(P_3, P_4, P_5\), find \(P_6\).</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 31</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PHYSICS SECTION (Q26-Q50) -->
+                <div id="sol-physics" class="space-y-8 hidden">
+                    <!-- Q26 (Ans: 2) -->
+                    <div class="space-y-2">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q26.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>A galvanometer of resistance \(30\Omega\) needs 20 mA for full-scale deflection. To measure up to 3 A, shunt resistance required is \(X\Omega\). Find X.</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">596</div>
+                                    <div class="p-2 border rounded correct-answer text-center">149</div>
+                                    <div class="p-2 border rounded text-center">298</div>
+                                    <div class="p-2 border rounded text-center">447</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q27 (Ans: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q27.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>A ball with kinetic energy KE is projected at \(60^\circ\). Kinetic energy at highest point is:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">8KE</div>
+                                    <div class="p-2 border rounded text-center">2KE</div>
+                                    <div class="p-2 border rounded text-center">16KE</div>
+                                    <div class="p-2 border rounded correct-answer text-center">4KE</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q28 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q28.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Charges \(7\mu C\) and \(-4\mu C\) at (–7 cm,0,0) and (7 cm,0,0). Potential energy is:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer">–1.8 J</div>
+                                    <div class="p-2 border rounded">–2.0 J</div>
+                                    <div class="p-2 border rounded">–1.5 J</div>
+                                    <div class="p-2 border rounded">–1.2 J</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q29 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q29.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Dipole charges –4\(\mu\)C and 4\(\mu\)C at (–9,0,0) and (9,0,0). Electric field = \(10^4\) N/C. Work in rotating dipole by \(180^\circ\):</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">18.4 mJ</div>
+                                    <div class="p-2 border rounded correct-answer">14.4 mJ</div>
+                                    <div class="p-2 border rounded">12.4 mJ</div>
+                                    <div class="p-2 border rounded">16.4 mJ</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q30 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q30.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Spring elongates \(x_1\) under 5 N and \(x_2\) under 7 N. For elongation \(5x_1 - 2x_2\), tension is:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">39 N</div>
+                                    <div class="p-2 border rounded text-center">15 N</div>
+                                    <div class="p-2 border rounded correct-answer text-center">11 N</div>
+                                    <div class="p-2 border rounded text-center">20 N</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q31 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q31.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Water mass = m g, temperature 300 K → 330 K. Specific heat = 1 J g⁻¹ K⁻¹. Entropy change:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer">\(m \ln(T_2/T_1)\)</div>
+                                    <div class="p-2 border rounded">zero</div>
+                                    <div class="p-2 border rounded">\(m \ln(T_1/T_2)\)</div>
+                                    <div class="p-2 border rounded">\(m(T_2 - T_1)\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q32 (Ans: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q32.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Pressure in pipe drops from \(P_1\) to \(P_2\) when valve opened. Speed \(\propto\) ?</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(P_1 - P_2\)</div>
+                                    <div class="p-2 border rounded">\((P_1 - P_2)^4\)</div>
+                                    <div class="p-2 border rounded">\((P_1 - P_2)^2\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(\sqrt{P_1 - P_2}\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q33 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q33.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Concave mirror focal length \(f\) in air, medium refractive index \(\mu\). Focal length in liquid:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">\(\mu f\)</div>
+                                    <div class="p-2 border rounded correct-answer text-center">\(f\)</div>
+                                    <div class="p-2 border rounded text-center">\((\mu - 1)f\)</div>
+                                    <div class="p-2 border rounded text-center">\(f/\mu\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q34 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q34.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Current through battery in given circuit: [Image of Circuit]</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">1.5 A</div>
+                                    <div class="p-2 border rounded correct-answer text-center">0.5 A</div>
+                                    <div class="p-2 border rounded text-center">0.25 A</div>
+                                    <div class="p-2 border rounded text-center">1.0 A</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q35 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q35.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Glass prism refractive index \(\sqrt{3}\). Angle of minimum deviation = angle of prism. Find prism angle.</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer text-center">\(60^\circ\)</div>
+                                    <div class="p-2 border rounded text-center">\(58^\circ\)</div>
+                                    <div class="p-2 border rounded text-center">\(48^\circ\)</div>
+                                    <div class="p-2 border rounded text-center">\(50^\circ\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q36 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q36.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Two-slit experiment: slit widths = \(d\) and \(x \cdot d\). Max : Min intensity = 9 : 4. Find \(x\).</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">4</div>
+                                    <div class="p-2 border rounded correct-answer text-center">5</div>
+                                    <div class="p-2 border rounded text-center">3</div>
+                                    <div class="p-2 border rounded text-center">2</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q37 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q37.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Work done by gas along ABCD path in PV diagram: </p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(+P_0V_0\)</div>
+                                    <div class="p-2 border rounded">\(3P_0V_0 - 4P_0V_0\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(-3P_0V_0\)</div>
+                                    <div class="p-2 border rounded">\(4P_0V_0\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q38 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q38.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>EM wave frequency 20 MHz along +x. At point: \(E_y = 9.3\) V/m. Magnetic field is:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(B_z = 6.2\times10^{-8}\) T</div>
+                                    <div class="p-2 border rounded correct-answer">\(B_z = 3.1\times10^{-8}\) T</div>
+                                    <div class="p-2 border rounded">\(B_z = 1.55\times10^{-8}\) T</div>
+                                    <div class="p-2 border rounded">\(B_z = 9.3\times10^{-8}\) T</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q39 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q39.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Wave: \(y(x,t) = 4\sin(20\times10^{-3}x + 600t)\). Velocity is:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">–60 m/s</div>
+                                    <div class="p-2 border rounded correct-answer">–30 m/s</div>
+                                    <div class="p-2 border rounded">+30 m/s</div>
+                                    <div class="p-2 border rounded">+60 m/s</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q40 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q40.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p><strong>Assertion (A):</strong> BE per nucleon nearly constant for A = 30–170.<br><strong>Reason (R):</strong> Nuclear force is long range.</p>
+                                <div class="grid grid-cols-1 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer">A true, R false</div>
+                                    <div class="p-2 border rounded">A false, R true</div>
+                                    <div class="p-2 border rounded">Both true, R correct explanation</div>
+                                    <div class="p-2 border rounded">Both true, R NOT correct explanation</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q41 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q41.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Satellite 9 times closer to Earth than Moon. Moon period = 27 days. Satellite period:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">27 days</div>
+                                    <div class="p-2 border rounded correct-answer text-center">1 day</div>
+                                    <div class="p-2 border rounded text-center">81 days</div>
+                                    <div class="p-2 border rounded text-center">3 days</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q42 (Ans: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q42.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Disc torque \(\tau = 5t^2 – 8t\). Power delivered at \(t=2\) s:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">\(72MR^2\)</div>
+                                    <div class="p-2 border rounded text-center">\(8MR^2\)</div>
+                                    <div class="p-2 border rounded text-center">\(108MR^2\)</div>
+                                    <div class="p-2 border rounded correct-answer text-center">\(60MR^2\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q43 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q43.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Energy \(E(t) = \alpha^3 e^{-\beta t}\), \(\beta = 0.3 \text{ s}^{-1}\). Errors: \(\alpha \to 1.2\%\), \(t \to 1.6\%\). Max % error at \(t = 5\) s:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer text-center">6%</div>
+                                    <div class="p-2 border rounded text-center">8.4%</div>
+                                    <div class="p-2 border rounded text-center">11.6%</div>
+                                    <div class="p-2 border rounded text-center">4%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q44 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q44.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Match List I–II (magnetic quantities).</p>
+                                <div class="grid grid-cols-1 gap-2 mt-2">
+                                    <div class="p-2 border rounded">(A–IV),(B–III),(C–I),(D–II)</div>
+                                    <div class="p-2 border rounded correct-answer">(A–III),(B–II),(C–IV),(D–I)</div>
+                                    <div class="p-2 border rounded">(A–I),(B–IV),(C–II),(D–III)</div>
+                                    <div class="p-2 border rounded">(A–II),(B–I),(C–III),(D–IV)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q45 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q45.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Photoelectric effect: work function = 2.14 eV, stopping potential = 2 V. Find wavelength.</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer text-center">300 nm</div>
+                                    <div class="p-2 border rounded text-center">400 nm</div>
+                                    <div class="p-2 border rounded text-center">600 nm</div>
+                                    <div class="p-2 border rounded text-center">200 nm</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q46 (Numerical: 100) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q46.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>A 2.5 \(\mu\)F capacitor has displacement current 0.25 mA. Find rate of change of voltage.</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 100</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q47 (Numerical: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q47.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Series LCR: R = 300 \(\Omega\), C = 25 nF, L = 100 mH. Angular frequency for max current = ?</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 2</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q48 (Numerical: 2190) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q48.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Air bubble radius 1 mm at 20 cm depth. Surface tension = 0.095 J/m², density = \(10^3\). Find pressure difference.</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 2190</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q49 (Numerical: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q49.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Satellite mass M, orbit height = 2R above Earth surface. Angular momentum = \(M\sqrt{GMR}\). Find orbital radius factor.</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 3</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q50 (Numerical: 16) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q50.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Steady state charge on capacitor (circuit shown) is:</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 16</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHEMISTRY SECTION (Q51-Q75) -->
+                <div id="sol-chemistry" class="space-y-8 hidden">
+                    <!-- Q51 (Ans: 2) -->
+                    <div class="space-y-2">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q51.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Reaction products A and B in \(K_2Cr_2O_7 \to A, B\):</p>
+                                <div class="grid grid-cols-1 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(K_2CrO_4, Cr_2O_3\)</div>
+                                    <div class="p-2 border rounded correct-answer">...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q52 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q52.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Given reactions, identify A and B:</p>
+                                <div class="grid grid-cols-1 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(K_2CrO_4\) & \(Cr_2O_3\)</div>
+                                    <div class="p-2 border rounded">\(K_2Cr_2O_7\) & \(K_2Cr(OH)_6\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(K_2CrO_4\) & \(Cr_2O_3\)</div>
+                                    <div class="p-2 border rounded">\(K_2Cr_2O_7\) & \(K_2Cr(OH)_6\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q53 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q53.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Effect of temperature on spontaneity:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer text-center">B & C</div>
+                                    <div class="p-2 border rounded text-center">B & D</div>
+                                    <div class="p-2 border rounded text-center">A & D</div>
+                                    <div class="p-2 border rounded text-center">A & C</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q54 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q54.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Graph representing zero-order reaction:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer">Option 1</div>
+                                    <div class="p-2 border rounded">Option 2</div>
+                                    <div class="p-2 border rounded">Option 3</div>
+                                    <div class="p-2 border rounded">Option 4</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q55 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q55.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>For \(X_2Y(g) = X_2(g) + \frac{1}{2}Y_2(g)\), relation between dissociation \(x\) and \(K_p\):</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(x = \sqrt{3/(2K_p p)}\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(x = \sqrt{3/(2K_p^2 p)}\)</div>
+                                    <div class="p-2 border rounded">\(x = \sqrt{3K_p/p}\)</div>
+                                    <div class="p-2 border rounded">\(x = \sqrt{3K_p/(2p)}\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q56 (Ans: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q56.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Two statements about reaction given.</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">Both false</div>
+                                    <div class="p-2 border rounded">I true, II false</div>
+                                    <div class="p-2 border rounded">I false, II true</div>
+                                    <div class="p-2 border rounded correct-answer">Both true</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q57 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q57.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>\(n^2\) orbitals in shell; \(m_l\) ranges –\(\ell\) to +\(\ell\).</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">Both false</div>
+                                    <div class="p-2 border rounded">I true, II false</div>
+                                    <div class="p-2 border rounded correct-answer">Both true</div>
+                                    <div class="p-2 border rounded">I false, II true</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q58 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q58.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Cell producing most negative \(\Delta G^\circ\):</p>
+                                <div class="grid grid-cols-1 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer">\(Zn|Zn^{2+}||Ag^+|Ag\)</div>
+                                    <div class="p-2 border rounded">\(Zn|Zn^{2+}||Mg^{2+}|Mg\)</div>
+                                    <div class="p-2 border rounded">\(Ag|Ag^+||Mg^{2+}|Mg\)</div>
+                                    <div class="p-2 border rounded">\(Cu|Cu^{2+}||Ag^+|Ag\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q59 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q59.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>\(\alpha\)-helix and \(\beta\)-sheet structures are part of:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">Tertiary</div>
+                                    <div class="p-2 border rounded">Quaternary</div>
+                                    <div class="p-2 border rounded correct-answer">Secondary</div>
+                                    <div class="p-2 border rounded">Primary</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q60 (Ans: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q60.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Atomic numbers: 6, 82, 14, 50. Lowest melting point:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">6</div>
+                                    <div class="p-2 border rounded text-center">82</div>
+                                    <div class="p-2 border rounded text-center">14</div>
+                                    <div class="p-2 border rounded correct-answer text-center">50</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q61 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q61.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>X-ray frequency vs atomic mass & atomic number:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">Both true</div>
+                                    <div class="p-2 border rounded">I false, II true</div>
+                                    <div class="p-2 border rounded correct-answer">Both false</div>
+                                    <div class="p-2 border rounded">I true, II false</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q62 (Ans: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q62.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Identify A and C in reaction sequence:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">Option 1</div>
+                                    <div class="p-2 border rounded">Option 2</div>
+                                    <div class="p-2 border rounded">Option 3</div>
+                                    <div class="p-2 border rounded correct-answer">Option 4</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q63 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q63.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Alcohols/phenols boiling point trends:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">Both false</div>
+                                    <div class="p-2 border rounded correct-answer">Both true</div>
+                                    <div class="p-2 border rounded">I false, II true</div>
+                                    <div class="p-2 border rounded">I true, II false</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q64 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q64.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Binary solution vapour pressure slope/intercept:</p>
+                                <div class="grid grid-cols-1 gap-2 mt-2">
+                                    <div class="p-2 border rounded">\(P_0{}_2\) & \(P_0{}_1\)</div>
+                                    <div class="p-2 border rounded correct-answer">\(P_0{}_2\) & \(P_0{}_2 - P_0{}_1\)</div>
+                                    <div class="p-2 border rounded">\(P_0{}_1\) & \(P_0{}_1 - P_0{}_2\)</div>
+                                    <div class="p-2 border rounded">\(P_0{}_2\) & \(P_0{}_1 - P_0{}_2\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q65 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q65.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Solvolysis order for compounds:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">C < B < A < D</div>
+                                    <div class="p-2 border rounded correct-answer">D < A < B < C</div>
+                                    <div class="p-2 border rounded">D < B < A < C</div>
+                                    <div class="p-2 border rounded">C < D < B < A</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q66 (Ans: 2) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q66.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Match alloys:</p>
+                                <div class="grid grid-cols-1 gap-2 mt-2">
+                                    <div class="p-2 border rounded">(A–IV),(B–II),(C–III),(D–I)</div>
+                                    <div class="p-2 border rounded correct-answer">(A–IV),(B–III),(C–I),(D–II)</div>
+                                    <div class="p-2 border rounded">(A–III),(B–IV),(C–II),(D–I)</div>
+                                    <div class="p-2 border rounded">(A–III),(B–I),(C–IV),(D–II)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q67 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q67.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Match coordination chemistry list:</p>
+                                <div class="grid grid-cols-1 gap-2 mt-2">
+                                    <div class="p-2 border rounded">(A–I),(B–IV),(C–III),(D–II)</div>
+                                    <div class="p-2 border rounded">(A–III),(B–II),(C–I),(D–IV)</div>
+                                    <div class="p-2 border rounded correct-answer">(A–III),(B–IV),(C–I),(D–II)</div>
+                                    <div class="p-2 border rounded">(A–II),(B–III),(C–I),(D–IV)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q68 (Ans: 1) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q68.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>pH of water at \(25^\circ\)C = 7. At \(80^\circ\)C, pH will:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded correct-answer">Decrease</div>
+                                    <div class="p-2 border rounded">\([H^+]\) increases, \([OH^-]\) decreases</div>
+                                    <div class="p-2 border rounded">Remain same</div>
+                                    <div class="p-2 border rounded">Increase</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q69 (Ans: 3) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q69.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Complexes with \(d^4\) configuration:</p>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <div class="p-2 border rounded">B, C, D</div>
+                                    <div class="p-2 border rounded">C, E</div>
+                                    <div class="p-2 border rounded correct-answer">B, D</div>
+                                    <div class="p-2 border rounded">A, B, E</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q70 (Ans: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q70.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Vapour pressure drop 10 mm Hg → solute fraction 0.2. For 20 mm drop, solvent mole fraction is:</p>
+                                <div class="grid grid-cols-4 gap-2 mt-2">
+                                    <div class="p-2 border rounded text-center">0.8</div>
+                                    <div class="p-2 border rounded text-center">0.4</div>
+                                    <div class="p-2 border rounded text-center">0.2</div>
+                                    <div class="p-2 border rounded correct-answer text-center">0.6</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q71 (Numerical: 100) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q71.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>0.01 mol organic compound gives 0.9 g water after combustion. Find molar mass.</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 100</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q72 (Numerical: 27) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q72.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Compound X absorbs 2 \(H_2\) → X′, oxidation gives Y. Total \(\sigma\)-bonds in X′:</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 27</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q73 (Numerical: 153) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q73.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>81 g Al reacts with 128 g \(O_2\). Mass of \(Al_2O_3\) formed (nearest integer):</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 153</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q74 (Numerical: 200) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q74.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Bond dissociation enthalpy of \(X_2\) from thermodynamic data:</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 200</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Q75 (Numerical: 4) -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex gap-2">
+                            <span class="font-bold text-allen-blue">Q75.</span>
+                            <div class="text-sm text-gray-800 space-y-2">
+                                <p>Sequential reactions produce compound C. Number of \(sp^3\)-hybridised carbons:</p>
+                                <div class="p-2 border rounded bg-green-50 text-green-700 font-semibold">Correct Answer: 4</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- DESKTOP SIDEBAR (Hidden on Mobile) -->
+    <!-- ... (No changes here) ... -->
+    <aside class="hidden md:flex w-24 bg-white flex-col items-center py-6 border-r border-gray-200 z-30 shadow-sm flex-shrink-0">
+        <div class="mt-20 flex flex-col items-center gap-8 w-full">
+            <div id="nav-tests" onclick="switchView('tests')" class="flex flex-col items-center gap-2 cursor-pointer group w-full relative">
+                <div id="bar-tests" class="absolute left-0 top-1/2 -translate-y-1/2 h-10 w-1 bg-allen-blue rounded-r-md"></div>
+                <div id="icon-bg-tests" class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-50 text-allen-blue transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h6"/><path d="M9 17h6"/><path d="M10 9h1"/></svg>
+                </div>
+                <span id="text-tests" class="text-xs font-semibold text-gray-800">Tests</span>
+            </div>
+            <div id="nav-results" onclick="switchView('results')" class="flex flex-col items-center gap-2 cursor-pointer group w-full relative">
+                <div id="bar-results" class="absolute left-0 top-1/2 -translate-y-1/2 h-10 w-1 bg-allen-blue rounded-r-md hidden"></div>
+                <div id="icon-bg-results" class="w-12 h-12 flex items-center justify-center rounded-xl text-gray-500 group-hover:bg-gray-50 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14l2 2 4-4"></path></svg>
+                </div>
+                <span id="text-results" class="text-xs font-semibold text-gray-600">Results</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <!-- ... (No changes here) ... -->
+    <div class="flex-1 flex flex-col h-full relative w-full overflow-hidden">
+        
+        <!-- HEADER -->
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 flex-shrink-0 z-20 sticky top-0 w-full">
+            <div class="flex items-center gap-2">
+                <button class="md:hidden p-1 -ml-1 text-gray-600">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+                <h1 class="text-2xl font-black tracking-tighter allen-blue italic">ALLEN</h1>
+            </div>
+            <div class="flex items-center gap-3 md:gap-6">
+                <button onclick="showToast('No new notifications')" class="relative p-2 rounded-full hover:bg-gray-100 transition-colors border border-gray-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full border-2 border-white">4</span>
+                </button>
+                <div class="flex items-center gap-3 pl-0 md:pl-4 md:border-l border-gray-200">
+                    <div class="text-right hidden md:block">
+                        <div class="text-sm font-bold text-gray-800">12th • JEE Adv.</div>
+                        <a href="#" class="text-xs text-blue-600 font-medium hover:underline flex items-center justify-end gap-1">Change course <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+                    </div>
+                    <div class="h-9 w-9 md:h-10 md:w-10 rounded-full bg-gray-200 overflow-hidden border border-gray-300">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Felix" alt="User Avatar" class="h-full w-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN SCROLLABLE AREA -->
+        <main class="flex-1 overflow-y-auto overflow-x-hidden p-0 relative bg-[#F0F5FA] pb-24 md:pb-0 scroll-smooth w-full">
+            <!-- VIEW 1: TESTS -->
+            <div id="view-tests" class="max-w-7xl mx-auto p-4 md:p-8 animate-fade-in">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-900">Your tests</h2>
+                    <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-700">View all</a>
+                </div>
+                <div class="flex gap-3 mb-6 overflow-x-auto pb-1 hide-scrollbar">
+                    <button class="px-5 py-2 bg-gray-900 text-white text-sm font-medium rounded-full shadow-md whitespace-nowrap active:scale-95 transition-transform">Upcoming</button>
+                    <button class="px-5 py-2 bg-white text-gray-600 text-sm font-medium rounded-full shadow-sm border border-gray-200 whitespace-nowrap active:scale-95 transition-transform">Missed</button>
+                    <button class="px-5 py-2 bg-white text-gray-600 text-sm font-medium rounded-full shadow-sm border border-gray-200 whitespace-nowrap active:scale-95 transition-transform">Completed</button>
+                </div>
+                <div class="w-full bg-white border-2 border-dashed border-gray-300 rounded-2xl h-64 md:h-80 flex flex-col items-center justify-center text-center p-6 mb-8 shadow-sm">
+                    <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0056D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-1">No upcoming tests</h3>
+                    <p class="text-gray-500 text-sm max-w-sm">You're all caught up! There are no tests scheduled for you at the moment.</p>
+                </div>
+            </div>
+
+            <!-- VIEW 2: RESULTS -->
+            <div id="view-results" class="max-w-7xl mx-auto hidden-view p-4 md:p-8 animate-fade-in">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-900">Test Results</h2>
+                    <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-700">View all</a>
+                </div>
+                <div class="flex gap-3 mb-6 overflow-x-auto pb-1 hide-scrollbar">
+                    <button class="px-5 py-2 bg-white text-gray-600 text-sm font-medium rounded-full shadow-sm border border-gray-200 whitespace-nowrap active:scale-95 transition-transform">Upcoming</button>
+                    <button class="px-5 py-2 bg-gray-900 text-white text-sm font-medium rounded-full shadow-md whitespace-nowrap active:scale-95 transition-transform">Past Tests</button>
+                    <button class="px-5 py-2 bg-white text-gray-600 text-sm font-medium rounded-full shadow-sm border border-gray-200 whitespace-nowrap active:scale-95 transition-transform">Missed Tests</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col transition-transform hover:-translate-y-1 duration-300">
+                        <div class="bg-[#D1FAE5] py-2 text-center border-b border-[#A7F3D0]">
+                            <span class="text-[#047857] text-xs uppercase tracking-wide font-bold">Results Declared</span>
+                        </div>
+                        <div class="p-5 flex flex-col h-full">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-lg font-bold text-gray-900 mb-1 leading-tight">SCORE TEST – Paper 1</h3>
+                                <div class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded">MAINS</div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs font-medium text-gray-500 mb-6 mt-2">
+                                <div class="flex items-center gap-1.5"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg><span>4 Dec 2024</span></div>
+                                <div class="flex items-center gap-1.5"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><span>180 Mins</span></div>
+                                <div class="flex items-center gap-1.5"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg><span>300 Marks</span></div>
+                            </div>
+                            <div class="mt-auto pt-4 border-t border-gray-100 grid grid-cols-2 gap-3">
+                                <button class="py-2.5 px-4 rounded-xl border border-blue-100 text-blue-600 font-semibold text-sm hover:bg-blue-50 transition-colors active:bg-blue-100">Re-attempt</button>
+                                <button onclick="openScoreAnalysis()" class="py-2.5 px-4 rounded-xl btn-blue text-white font-semibold text-sm shadow-md active:opacity-90 transition-opacity">View Result</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: SCORE ANALYSIS -->
+            <div id="view-score-analysis" class="w-full hidden-view bg-[#F0F5FA] min-h-full flex flex-col">
+                <div class="sticky top-0 md:static bg-white/95 backdrop-blur z-20 px-4 md:px-8 py-3 border-b border-gray-200 shadow-sm w-full">
+                    <div class="max-w-[1600px] mx-auto flex items-center justify-between">
+                        <div class="flex items-center gap-2 overflow-hidden">
+                            <button onclick="handleBackNavigation()" class="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0 active:bg-gray-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                            </button>
+                            <div class="flex flex-col min-w-0">
+                                <span class="font-bold text-sm md:text-lg text-gray-900 truncate">SCORE TEST - Paper 1</span>
+                                <span class="text-[10px] md:text-xs text-gray-500">28th Nov • Online</span>
+                            </div>
+                        </div>
+                        <div class="hidden md:flex gap-3">
+                            <button class="px-4 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200">Analysis</button>
+                            <button onclick="openSolutions()" id="btn-solutions-desktop" class="px-4 py-1.5 bg-white border border-gray-300 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50">Solutions</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:hidden sticky top-[61px] z-10 bg-white border-b border-gray-200 overflow-x-auto hide-scrollbar w-full">
+                    <div class="flex p-3 gap-2 min-w-max">
+                        <button onclick="updateReportView('overview')" id="mob-tab-overview" class="px-4 py-1.5 rounded-full text-sm font-medium bg-gray-900 text-white shadow-sm transition-all">Overview</button>
+                        <button onclick="updateReportView('chemistry')" id="mob-tab-chemistry" class="px-4 py-1.5 rounded-full text-sm font-medium bg-white border border-gray-200 text-gray-600 shadow-sm transition-all">Chemistry</button>
+                        <button onclick="updateReportView('physics')" id="mob-tab-physics" class="px-4 py-1.5 rounded-full text-sm font-medium bg-white border border-gray-200 text-gray-600 shadow-sm transition-all">Physics</button>
+                        <button onclick="updateReportView('maths')" id="mob-tab-maths" class="px-4 py-1.5 rounded-full text-sm font-medium bg-white border border-gray-200 text-gray-600 shadow-sm transition-all">Maths</button>
+                        <button onclick="openSolutions()" id="mob-tab-solutions" class="px-4 py-1.5 rounded-full text-sm font-medium bg-green-50 border border-green-200 text-green-700 shadow-sm transition-all">Solutions</button>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row max-w-[1600px] mx-auto w-full p-4 md:p-6 gap-4 md:gap-6 items-start overflow-hidden">
+                    <div class="hidden md:block w-64 flex-shrink-0 sticky top-4">
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2">
+                            <div id="nav-item-overview" onclick="updateReportView('overview')" class="flex items-center justify-between p-3 rounded-xl cursor-pointer bg-blue-50 text-blue-700 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                                    <span class="font-bold text-sm">Overview</span>
+                                </div>
+                            </div>
+                            <div class="px-4 py-2 mt-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Subjects</div>
+                            <div class="space-y-1">
+                                <div id="nav-item-chemistry" onclick="updateReportView('chemistry')" class="flex items-center justify-between p-3 rounded-xl cursor-pointer hover:bg-gray-50 text-gray-600">
+                                    <span class="pl-2 text-sm font-medium">Chemistry</span>
+                                </div>
+                                <div id="nav-item-physics" onclick="updateReportView('physics')" class="flex items-center justify-between p-3 rounded-xl cursor-pointer hover:bg-gray-50 text-gray-600">
+                                    <span class="pl-2 text-sm font-medium">Physics</span>
+                                </div>
+                                <div id="nav-item-maths" onclick="updateReportView('maths')" class="flex items-center justify-between p-3 rounded-xl cursor-pointer hover:bg-gray-50 text-gray-600">
+                                    <span class="pl-2 text-sm font-medium">Maths</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 w-full space-y-4 md:space-y-6 min-w-0"> 
+                        <div id="report-card" class="relative overflow-hidden rounded-2xl md:rounded-3xl shadow-lg transition-all duration-500 bg-gradient-to-br from-orange-400 to-orange-600 text-white w-full">
+                            <div class="absolute right-0 top-0 h-full w-full opacity-10 pointer-events-none">
+                                <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                    <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
+                                </svg>
+                            </div>
+                            <div class="relative z-10 p-5 md:p-8 flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
+                                <div class="flex flex-col items-center">
+                                    <h3 id="report-title" class="text-lg font-bold mb-4 opacity-90 hidden">Subject Report</h3>
+                                    <div class="relative w-40 h-40 md:w-48 md:h-48 flex items-center justify-center">
+                                        <div id="score-progress-ring" class="absolute inset-0 rounded-full score-circle shadow-2xl"></div>
+                                        <div id="score-inner-circle" class="absolute inset-2 rounded-full bg-orange-500 flex flex-col items-center justify-center shadow-inner transition-colors duration-500">
+                                            <span id="score-obtained" class="text-4xl md:text-5xl font-black tracking-tighter">229</span>
+                                            <div class="w-8 h-1 bg-white/40 rounded-full my-2"></div>
+                                            <span id="score-total" class="text-sm md:text-base font-medium opacity-80">out of 300</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 px-4 py-1.5 bg-white/20 backdrop-blur rounded-full text-xs font-semibold border border-white/30">
+                                        <span id="class-average">Avg: 108</span>
+                                    </div>
+                                </div>
+                                <div class="w-full md:w-auto flex-1 grid grid-cols-1 gap-2 md:gap-3 self-stretch md:self-center">
+                                    <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 flex items-center justify-between text-left">
+                                        <div class="text-[10px] md:text-xs text-white/70 uppercase font-bold">Test Rank</div>
+                                        <div class="flex flex-col items-end">
+                                            <div class="text-lg md:text-xl font-bold leading-none"><span id="rank-test">34</span><span class="text-[10px] opacity-60 font-normal" id="rank-test-total">/1326</span></div>
+                                            <div id="percentile-test" class="text-[9px] md:text-[10px] opacity-80 mt-1">97.44 %ile</div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 flex items-center justify-between text-left">
+                                        <div class="text-[10px] md:text-xs text-white/70 uppercase font-bold">Campus Rank</div>
+                                        <div class="flex flex-col items-end">
+                                            <div class="text-lg md:text-xl font-bold leading-none"><span id="rank-campus">11</span><span class="text-[10px] opacity-60 font-normal" id="rank-campus-total">/139</span></div>
+                                            <div id="percentile-campus" class="text-[9px] md:text-[10px] opacity-80 mt-1">92.09 %ile</div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 flex items-center justify-between text-left">
+                                        <div class="text-[10px] md:text-xs text-white/70 uppercase font-bold">Batch Rank</div>
+                                        <div class="flex flex-col items-end">
+                                            <div class="text-lg md:text-xl font-bold leading-none"><span id="rank-batch">5</span><span class="text-[10px] opacity-60 font-normal" id="rank-batch-total">/39</span></div>
+                                            <div id="percentile-batch" class="text-[9px] md:text-[10px] opacity-80 mt-1">87.18 %ile</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-6 w-full">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Performance Stats</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                                <div class="bg-green-50 border border-green-100 rounded-xl p-4 flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs font-semibold text-green-700 uppercase">Correct</div>
+                                        <div class="text-2xl font-bold text-gray-800 mt-1" id="qs-correct">59</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-bold text-green-600" id="marks-correct">+236.00</div>
+                                        <div class="text-[10px] text-green-600/70">Marks</div>
+                                    </div>
+                                </div>
+                                <div class="bg-red-50 border border-red-100 rounded-xl p-4 flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs font-semibold text-red-700 uppercase">Incorrect</div>
+                                        <div class="text-2xl font-bold text-gray-800 mt-1" id="qs-incorrect">7</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-bold text-red-600" id="marks-incorrect">-7.00</div>
+                                        <div class="text-[10px] text-red-600/70">Marks</div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs font-semibold text-gray-500 uppercase">Skipped</div>
+                                        <div class="text-2xl font-bold text-gray-800 mt-1" id="qs-unattempted">9</div>
+                                    </div>
+                                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="flex items-center gap-2">
+                                    <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 w-[89%]"></div>
+                                    </div>
+                                    <span class="text-xs font-medium text-gray-600" id="accuracy-text">89% Accuracy</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="subject-overview-table" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden w-full">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Subject Breakdown</h3>
+                            <div class="flex flex-col gap-3">
+                                <div onclick="updateReportView('chemistry')" class="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:bg-gray-50 cursor-pointer active:bg-gray-100 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm">Ch</div>
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-800">Chemistry</div>
+                                            <div class="text-xs text-gray-500">17m 10s • Rank 52</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-bold text-gray-800">69 <span class="text-xs font-normal text-gray-400">/100</span></div>
+                                        <div class="flex items-center justify-end gap-1 text-[10px] mt-0.5">
+                                            <span class="text-green-600 font-medium">18✓</span>
+                                            <span class="text-red-500 font-medium">3✕</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div onclick="updateReportView('physics')" class="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:bg-gray-50 cursor-pointer active:bg-gray-100 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">Ph</div>
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-800">Physics</div>
+                                            <div class="text-xs text-gray-500">2h 09m • Rank 19</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-bold text-gray-800">82 <span class="text-xs font-normal text-gray-400">/100</span></div>
+                                        <div class="flex items-center justify-end gap-1 text-[10px] mt-0.5">
+                                            <span class="text-green-600 font-medium">21✓</span>
+                                            <span class="text-red-500 font-medium">2✕</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div onclick="updateReportView('maths')" class="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:bg-gray-50 cursor-pointer active:bg-gray-100 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center font-bold text-sm">Ma</div>
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-800">Maths</div>
+                                            <div class="text-xs text-gray-500">33m 36s • Rank 39</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-bold text-gray-800">78 <span class="text-xs font-normal text-gray-400">/100</span></div>
+                                        <div class="flex items-center justify-end gap-1 text-[10px] mt-0.5">
+                                            <span class="text-green-600 font-medium">20✓</span>
+                                            <span class="text-red-500 font-medium">2✕</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="leaderboard-section" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-6 w-full mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Top Performers</h3>
+                            </div>
+                            <div class="overflow-x-auto hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+                                <table class="w-full min-w-[700px] border-collapse">
+                                    <thead>
+                                        <tr class="text-left text-xs font-semibold text-gray-500 border-b border-gray-100 uppercase tracking-wider">
+                                            <th class="pb-3 pl-2 w-10">Rank</th>
+                                            <th class="pb-3">Name</th>
+                                            <th class="pb-3 text-right">Score</th>
+                                            <th class="pb-3 text-right text-green-600"><span class="md:hidden">✓</span><span class="hidden md:inline">✓ Qs</span></th>
+                                            <th class="pb-3 text-right text-red-500"><span class="md:hidden">✕</span><span class="hidden md:inline">✕ Qs</span></th>
+                                            <th class="pb-3 text-right">Time</th>
+                                            <th class="pb-3 text-right text-purple-600">Chem</th>
+                                            <th class="pb-3 text-right text-teal-600">Maths</th>
+                                            <th class="pb-3 text-right text-blue-600 pr-2">Phy</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-sm text-gray-700 divide-y divide-gray-50">
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-3 pl-2"><div class="w-6 h-6 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center font-bold text-xs">1</div></td>
+                                            <td class="py-3 font-semibold text-gray-900">Uday V. Gaikwad</td>
+                                            <td class="py-3 text-right font-bold">275</td>
+                                            <td class="py-3 text-right text-green-600 font-medium">70</td>
+                                            <td class="py-3 text-right text-red-500 font-medium">5</td>
+                                            <td class="py-3 text-right text-xs text-gray-500">3H 00M</td>
+                                            <td class="py-3 text-right font-medium">95</td>
+                                            <td class="py-3 text-right font-medium">90</td>
+                                            <td class="py-3 text-right font-medium pr-2">90</td>
+                                        </tr>
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-3 pl-2"><div class="w-6 h-6 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs">2</div></td>
+                                            <td class="py-3 font-semibold text-gray-900">Chakshan Arora</td>
+                                            <td class="py-3 text-right font-bold">265</td>
+                                            <td class="py-3 text-right text-green-600 font-medium">68</td>
+                                            <td class="py-3 text-right text-red-500 font-medium">7</td>
+                                            <td class="py-3 text-right text-xs text-gray-500">3H 00M</td>
+                                            <td class="py-3 text-right font-medium">75</td>
+                                            <td class="py-3 text-right font-medium">95</td>
+                                            <td class="py-3 text-right font-medium pr-2">95</td>
+                                        </tr>
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-3 pl-2"><div class="w-6 h-6 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-xs">3</div></td>
+                                            <td class="py-3 font-semibold text-gray-900">Shiv Rameshkumar</td>
+                                            <td class="py-3 text-right font-bold">265</td>
+                                            <td class="py-3 text-right text-green-600 font-medium">68</td>
+                                            <td class="py-3 text-right text-red-500 font-medium">7</td>
+                                            <td class="py-3 text-right text-xs text-gray-500">3H 00M</td>
+                                            <td class="py-3 text-right font-medium">90</td>
+                                            <td class="py-3 text-right font-medium">90</td>
+                                            <td class="py-3 text-right font-medium pr-2">85</td>
+                                        </tr>
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-3 pl-2 font-bold text-gray-400 text-center">4</td>
+                                            <td class="py-3 font-medium text-gray-800">Roneet Chaudhari</td>
+                                            <td class="py-3 text-right font-bold">260</td>
+                                            <td class="py-3 text-right text-green-600 font-medium">67</td>
+                                            <td class="py-3 text-right text-red-500 font-medium">8</td>
+                                            <td class="py-3 text-right text-xs text-gray-500">3H 00M</td>
+                                            <td class="py-3 text-right font-medium">85</td>
+                                            <td class="py-3 text-right font-medium">95</td>
+                                            <td class="py-3 text-right font-medium pr-2">80</td>
+                                        </tr>
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-3 pl-2 font-bold text-gray-400 text-center">5</td>
+                                            <td class="py-3 font-medium text-gray-800">Aditya Chavan</td>
+                                            <td class="py-3 text-right font-bold">260</td>
+                                            <td class="py-3 text-right text-green-600 font-medium">67</td>
+                                            <td class="py-3 text-right text-red-500 font-medium">8</td>
+                                            <td class="py-3 text-right text-xs text-gray-500">3H 00M</td>
+                                            <td class="py-3 text-right font-medium">90</td>
+                                            <td class="py-3 text-right font-medium">90</td>
+                                            <td class="py-3 text-right font-medium pr-2">80</td>
+                                        </tr>
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-3 pl-2 font-bold text-gray-400 text-center">6</td>
+                                            <td class="py-3 font-medium text-gray-800">Rutu S. Hendre</td>
+                                            <td class="py-3 text-right font-bold">260</td>
+                                            <td class="py-3 text-right text-green-600 font-medium">67</td>
+                                            <td class="py-3 text-right text-red-500 font-medium">8</td>
+                                            <td class="py-3 text-right text-xs text-gray-500">3H 00M</td>
+                                            <td class="py-3 text-right font-medium">90</td>
+                                            <td class="py-3 text-right font-medium">90</td>
+                                            <td class="py-3 text-right font-medium pr-2">80</td>
+                                        </tr>
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-3 pl-2 font-bold text-gray-400 text-center">7</td>
+                                            <td class="py-3 font-medium text-gray-800">Ashutosh J. Kal...</td>
+                                            <td class="py-3 text-right font-bold">260</td>
+                                            <td class="py-3 text-right text-green-600 font-medium">67</td>
+                                            <td class="py-3 text-right text-red-500 font-medium">8</td>
+                                            <td class="py-3 text-right text-xs text-gray-500">3H 00M</td>
+                                            <td class="py-3 text-right font-medium">85</td>
+                                            <td class="py-3 text-right font-medium">85</td>
+                                            <td class="py-3 text-right font-medium pr-2">90</td>
+                                        </tr>
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-3 pl-2 font-bold text-gray-400 text-center">8</td>
+                                            <td class="py-3 font-medium text-gray-800">Prajwal Kawade</td>
+                                            <td class="py-3 text-right font-bold">260</td>
+                                            <td class="py-3 text-right text-green-600 font-medium">67</td>
+                                            <td class="py-3 text-right text-red-500 font-medium">8</td>
+                                            <td class="py-3 text-right text-xs text-gray-500">3H 00M</td>
+                                            <td class="py-3 text-right font-medium">95</td>
+                                            <td class="py-3 text-right font-medium">85</td>
+                                            <td class="py-3 text-right font-medium pr-2">80</td>
+                                        </tr>
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-3 pl-2 font-bold text-gray-400 text-center">9</td>
+                                            <td class="py-3 font-medium text-gray-800">Suraj R. Thorat</td>
+                                            <td class="py-3 text-right font-bold">258</td>
+                                            <td class="py-3 text-right text-green-600 font-medium">66</td>
+                                            <td class="py-3 text-right text-red-500 font-medium">6</td>
+                                            <td class="py-3 text-right text-xs text-gray-500">3H 00M</td>
+                                            <td class="py-3 text-right font-medium">78</td>
+                                            <td class="py-3 text-right font-medium">90</td>
+                                            <td class="py-3 text-right font-medium pr-2">90</td>
+                                        </tr>
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-3 pl-2 font-bold text-gray-400 text-center">10</td>
+                                            <td class="py-3 font-medium text-gray-800">Charvi Kale</td>
+                                            <td class="py-3 text-right font-bold">257</td>
+                                            <td class="py-3 text-right text-green-600 font-medium">66</td>
+                                            <td class="py-3 text-right text-red-500 font-medium">7</td>
+                                            <td class="py-3 text-right text-xs text-gray-500">3H 00M</td>
+                                            <td class="py-3 text-right font-medium">77</td>
+                                            <td class="py-3 text-right font-medium">90</td>
+                                            <td class="py-3 text-right font-medium pr-2">90</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center z-50 safe-area-pb shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <!-- Tests Nav -->
+        <button id="mob-nav-tests" onclick="switchView('tests')" class="flex-1 py-3 flex flex-col items-center gap-1 active:bg-gray-50 transition-colors text-allen-blue">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h6"/><path d="M9 17h6"/><path d="M10 9h1"/></svg>
+            <span class="text-[10px] font-semibold">Tests</span>
+        </button>
+        <!-- Results Nav -->
+        <button id="mob-nav-results" onclick="switchView('results')" class="flex-1 py-3 flex flex-col items-center gap-1 active:bg-gray-50 transition-colors text-gray-400">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14l2 2 4-4"></path></svg>
+            <span class="text-[10px] font-semibold">Results</span>
+        </button>
+    </nav>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <script>
+        // ... (Script section remains unchanged)
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function openSolutions() {
+            let subject = reports[currentReportIndex];
+            if (subject === 'overview') {
+                subject = 'maths';
+            }
+            document.getElementById('sol-maths').classList.add('hidden');
+            document.getElementById('sol-physics').classList.add('hidden');
+            document.getElementById('sol-chemistry').classList.add('hidden');
+
+            if (subject === 'maths') {
+                document.getElementById('sol-maths').classList.remove('hidden');
+                document.getElementById('solutions-title').textContent = "Mathematics Solutions";
+            } else if (subject === 'physics') {
+                document.getElementById('sol-physics').classList.remove('hidden');
+                document.getElementById('solutions-title').textContent = "Physics Solutions";
+            } else if (subject === 'chemistry') {
+                document.getElementById('sol-chemistry').classList.remove('hidden');
+                document.getElementById('solutions-title').textContent = "Chemistry Solutions";
+            }
+
+            document.getElementById('solutions-modal').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('solutions-panel').classList.add('solutions-open');
+            }, 10);
+        }
+
+        function closeSolutions() {
+            document.getElementById('solutions-panel').classList.remove('solutions-open');
+            setTimeout(() => {
+                document.getElementById('solutions-modal').classList.add('hidden');
+            }, 300);
+        }
+
+        function openScoreAnalysis() {
+            document.getElementById('view-tests').classList.add('hidden-view');
+            document.getElementById('view-results').classList.add('hidden-view');
+            document.getElementById('view-score-analysis').classList.remove('hidden-view');
+            document.querySelector('main').scrollTop = 0;
+            updateReportView('overview');
+            updateNavState('results');
+        }
+
+        function switchView(viewName) {
+            const viewTests = document.getElementById('view-tests');
+            const viewResults = document.getElementById('view-results');
+            const viewScoreAnalysis = document.getElementById('view-score-analysis');
+            
+            viewScoreAnalysis.classList.add('hidden-view');
+
+            if (viewName === 'tests') {
+                viewTests.classList.remove('hidden-view');
+                viewResults.classList.add('hidden-view');
+            } else if (viewName === 'results') {
+                viewTests.classList.add('hidden-view');
+                viewResults.classList.remove('hidden-view');
+            }
+            updateNavState(viewName);
+        }
+
+        function updateNavState(activeView) {
+            const navTestsBar = document.getElementById('bar-tests');
+            const navResultsBar = document.getElementById('bar-results');
+            const iconBgTests = document.getElementById('icon-bg-tests');
+            const iconBgResults = document.getElementById('icon-bg-results');
+            const textTests = document.getElementById('text-tests');
+            const textResults = document.getElementById('text-results');
+            const mobTests = document.getElementById('mob-nav-tests');
+            const mobResults = document.getElementById('mob-nav-results');
+
+            if (activeView === 'tests') {
+                navTestsBar.classList.remove('hidden');
+                iconBgTests.className = "w-12 h-12 flex items-center justify-center rounded-xl bg-blue-50 text-allen-blue transition-colors";
+                textTests.className = "text-xs font-semibold text-gray-800";
+                
+                navResultsBar.classList.add('hidden');
+                iconBgResults.className = "w-12 h-12 flex items-center justify-center rounded-xl text-gray-500 group-hover:bg-gray-50 transition-colors";
+                textResults.className = "text-xs font-semibold text-gray-600";
+
+                mobTests.className = "flex-1 py-3 flex flex-col items-center gap-1 active:bg-gray-50 transition-colors text-allen-blue";
+                mobResults.className = "flex-1 py-3 flex flex-col items-center gap-1 active:bg-gray-50 transition-colors text-gray-400";
+            } else {
+                navTestsBar.classList.add('hidden');
+                iconBgTests.className = "w-12 h-12 flex items-center justify-center rounded-xl text-gray-500 group-hover:bg-gray-50 transition-colors";
+                textTests.className = "text-xs font-semibold text-gray-600";
+
+                navResultsBar.classList.remove('hidden');
+                iconBgResults.className = "w-12 h-12 flex items-center justify-center rounded-xl bg-blue-50 text-allen-blue transition-colors";
+                textResults.className = "text-xs font-semibold text-gray-800";
+
+                mobTests.className = "flex-1 py-3 flex flex-col items-center gap-1 active:bg-gray-50 transition-colors text-gray-400";
+                mobResults.className = "flex-1 py-3 flex flex-col items-center gap-1 active:bg-gray-50 transition-colors text-allen-blue";
+            }
+        }
+
+        let subjectsExpanded = false;
+        const reports = ['overview', 'chemistry', 'physics', 'maths'];
+        let currentReportIndex = 0;
+        
+        const data = {
+            overview: { 
+                title: "", 
+                bgGradient: "from-orange-400 to-orange-600", 
+                innerCircleBg: "bg-orange-500", 
+                score: 229, total: 300, avg: 108, 
+                ranks: { test: 34, testTotal: 1326, testPerc: "97.44", campus: 11, campusTotal: 139, campusPerc: "92.09", batch: 5, batchTotal: 39, batchPerc: "87.18" }, 
+                qs: { correct: 59, marksC: "+236.00", incorrect: 7, marksI: "-7.00", un: 9 }, 
+                accuracy: "89%", showTable: true 
+            },
+            chemistry: { 
+                title: "Chemistry", 
+                bgGradient: "from-purple-500 to-purple-700", 
+                innerCircleBg: "bg-purple-600", 
+                score: 69, total: 100, avg: 32, 
+                ranks: { test: 52, testTotal: 1326, testPerc: "50.00", campus: 17, campusTotal: 139, campusPerc: "43.86", batch: 15, batchTotal: 39, batchPerc: "18.75" }, 
+                qs: { correct: 18, marksC: "+72", incorrect: 3, marksI: "-3", un: 4 }, 
+                accuracy: "86%", showTable: true 
+            },
+            physics: { 
+                title: "Physics", 
+                bgGradient: "from-blue-500 to-blue-700", 
+                innerCircleBg: "bg-blue-600", 
+                score: 82, total: 100, avg: 35, 
+                ranks: { test: 19, testTotal: 1326, testPerc: "80.07", campus: 11, campusTotal: 139, campusPerc: "71.93", batch: 9, batchTotal: 39, batchPerc: "56.25" }, 
+                qs: { correct: 21, marksC: "+84", incorrect: 2, marksI: "-2", un: 2 }, 
+                accuracy: "91%", showTable: true 
+            },
+            maths: { 
+                title: "Maths", 
+                bgGradient: "from-teal-500 to-teal-700", 
+                innerCircleBg: "bg-teal-600", 
+                score: 78, total: 100, avg: 41, 
+                ranks: { test: 39, testTotal: 1326, testPerc: "99.46", campus: 4, campusTotal: 139, campusPerc: "99.12", batch: 2, batchTotal: 39, batchPerc: "100.00" }, 
+                qs: { correct: 20, marksC: "+80", incorrect: 2, marksI: "-2", un: 3 }, 
+                accuracy: "91%", showTable: true 
+            }
+        };
+
+        function updateReportView(type) {
+            currentReportIndex = reports.indexOf(type);
+            resetSidebarActive();
+            if (type === 'overview') {
+                document.getElementById('nav-item-overview').className = "flex items-center justify-between p-3 rounded-xl cursor-pointer bg-blue-50 text-blue-700 transition-colors";
+            } else {
+                document.getElementById(`nav-item-${type}`).className = "flex items-center justify-between p-3 rounded-xl cursor-pointer bg-gray-100 text-gray-900 font-bold";
+            }
+            resetMobileTabs();
+            document.getElementById(`mob-tab-${type}`).className = "px-4 py-1.5 rounded-full text-sm font-medium bg-gray-900 text-white shadow-sm transition-all";
+
+            const d = data[type];
+            const card = document.getElementById('report-card');
+            card.className = `relative overflow-hidden rounded-2xl md:rounded-3xl shadow-lg transition-all duration-500 text-white bg-gradient-to-br ${d.bgGradient} w-full`;
+            
+            const inner = document.getElementById('score-inner-circle');
+            inner.className = `absolute inset-2 rounded-full flex flex-col items-center justify-center shadow-inner transition-colors duration-500 ${d.innerCircleBg}`;
+
+            const percentage = Math.round((d.score / d.total) * 100);
+            document.getElementById('score-progress-ring').style.background = `conic-gradient(#ffffff ${percentage}%, rgba(255,255,255,0.2) 0)`;
+
+            const titleEl = document.getElementById('report-title');
+            if (d.title) { titleEl.textContent = d.title + " Report"; titleEl.classList.remove('hidden'); } 
+            else { titleEl.classList.add('hidden'); }
+
+            document.getElementById('score-obtained').textContent = d.score;
+            document.getElementById('score-total').textContent = "out of " + d.total;
+            document.getElementById('class-average').textContent = `Avg: ${d.avg}`;
+            
+            document.getElementById('rank-test').textContent = d.ranks.test;
+            document.getElementById('rank-test-total').textContent = `/${d.ranks.testTotal}`;
+            document.getElementById('percentile-test').textContent = `${d.ranks.testPerc} %ile`;
+
+            document.getElementById('rank-campus').textContent = d.ranks.campus;
+            document.getElementById('rank-campus-total').textContent = `/${d.ranks.campusTotal}`;
+            document.getElementById('percentile-campus').textContent = `${d.ranks.campusPerc} %ile`;
+
+            document.getElementById('rank-batch').textContent = d.ranks.batch;
+            document.getElementById('rank-batch-total').textContent = `/${d.ranks.batchTotal}`;
+            document.getElementById('percentile-batch').textContent = `${d.ranks.batchPerc} %ile`;
+
+            document.getElementById('accuracy-text').textContent = `You've answered ${d.accuracy} questions correctly`;
+            document.getElementById('qs-correct').textContent = d.qs.correct;
+            document.getElementById('marks-correct').textContent = d.qs.marksC;
+            document.getElementById('qs-incorrect').textContent = d.qs.incorrect;
+            document.getElementById('marks-incorrect').textContent = d.qs.marksI;
+            document.getElementById('qs-unattempted').textContent = d.qs.un;
+
+            const table = document.getElementById('subject-overview-table');
+            const leaderboard = document.getElementById('leaderboard-section');
+            if (d.showTable) { 
+                table.classList.remove('hidden'); 
+                if(leaderboard) leaderboard.classList.remove('hidden'); 
+            } else { 
+                table.classList.add('hidden'); 
+                if(leaderboard) leaderboard.classList.add('hidden'); 
+            }
+        }
+
+        function resetSidebarActive() {
+            document.getElementById('nav-item-overview').className = "flex items-center justify-between p-3 rounded-xl cursor-pointer hover:bg-blue-50 hover:text-blue-600 text-gray-600 transition-colors";
+            ['chemistry', 'physics', 'maths'].forEach(sub => {
+                document.getElementById(`nav-item-${sub}`).className = "flex items-center justify-between p-3 rounded-xl cursor-pointer hover:bg-gray-50 text-gray-600 transition-colors";
+            });
+        }
+
+        function resetMobileTabs() {
+            ['overview', 'chemistry', 'physics', 'maths'].forEach(sub => {
+                document.getElementById(`mob-tab-${sub}`).className = "px-4 py-1.5 rounded-full text-sm font-medium bg-white border border-gray-200 text-gray-600 shadow-sm transition-all";
+            });
+        }
+
+        function handleBackNavigation() {
+            if (reports[currentReportIndex] !== 'overview') updateReportView('overview');
+            else switchView('results');
+        }
+    </script>
+</body>
+</html>
